@@ -381,6 +381,68 @@
       margin-top: 0.05rem;
     }
 
+    /* ── Liturgy Selector ── */
+    .liturgy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    @media (max-width: 400px) { .liturgy-grid { grid-template-columns: repeat(2, 1fr); } }
+    .liturgy-btn {
+      padding: 0.7rem 0.5rem;
+      border: 2px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      color: var(--text-mid);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .liturgy-btn:hover { border-color: var(--amber); color: var(--brown-dark); }
+    .liturgy-btn.active {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(200,130,42,0.3);
+    }
+    .liturgy-ref-box {
+      background: var(--cream-mid);
+      border: 1px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .liturgy-ref-item { text-align: center; flex: 1; min-width: 80px; }
+    .liturgy-ref-item .ref-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--brown-dark);
+    }
+    .liturgy-ref-item .ref-lbl {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      margin-top: 0.2rem;
+    }
+    .liturgy-note {
+      font-size: 0.8rem;
+      color: var(--text-mid);
+      font-style: italic;
+      width: 100%;
+      border-top: 1px solid var(--cream-border);
+      padding-top: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
     /* ── Note Banner ── */
     .note-banner {
       background: #FFF8E6;
@@ -441,23 +503,39 @@
     </div>
   </div>
 
+  <!-- Liturgy Selector -->
+  <div class="card">
+    <div class="card-title">Select Your Liturgy</div>
+    <div class="liturgy-grid">
+      <button class="liturgy-btn" data-liturgy="tuesday">Tuesday<br>Liturgy</button>
+      <button class="liturgy-btn" data-liturgy="thursday">Thursday<br>Liturgy</button>
+      <button class="liturgy-btn" data-liturgy="saturday">Saturday<br>Liturgy</button>
+      <button class="liturgy-btn" data-liturgy="sunday1">Sunday<br>1st Liturgy</button>
+      <button class="liturgy-btn" data-liturgy="sunday2">Sunday<br>2nd Liturgy</button>
+    </div>
+    <div id="liturgy-ref" style="display:none;" class="liturgy-ref-box">
+      <div class="liturgy-ref-item">
+        <div class="ref-val" id="ref-flour">—</div>
+        <div class="ref-lbl">Dry Flour</div>
+      </div>
+      <div class="liturgy-ref-item">
+        <div class="ref-val" id="ref-size">—</div>
+        <div class="ref-lbl">Orban Size</div>
+      </div>
+      <div class="liturgy-ref-item">
+        <div class="ref-val" id="ref-min">—</div>
+        <div class="ref-lbl">Min # of Orban</div>
+      </div>
+      <div class="liturgy-note" id="ref-note" style="display:none;"></div>
+    </div>
+  </div>
+
   <!-- Input: By Weight -->
   <div class="card" id="weight-panel">
-    <div class="card-title">Target Dough Weight</div>
-    <div class="preset-grid">
-      <button class="preset-btn" data-grams="250">250 g</button>
-      <button class="preset-btn" data-grams="500">500 g</button>
-      <button class="preset-btn" data-grams="750">750 g</button>
-      <button class="preset-btn" data-grams="1000">1 kg</button>
-      <button class="preset-btn" data-grams="1500">1.5 kg</button>
-      <button class="preset-btn" data-grams="2000">2 kg</button>
-      <button class="preset-btn" data-grams="3000">3 kg</button>
-      <button class="preset-btn" data-grams="5000">5 kg</button>
-      <button class="preset-btn active" data-grams="custom">Custom</button>
-    </div>
+    <div class="card-title">Dry Flour Amount</div>
     <div class="custom-input-wrap" id="custom-wrap">
-      <input type="number" id="custom-kg" placeholder="e.g. 4.5" min="0.1" step="0.1">
-      <span>kg total dough</span>
+      <input type="number" id="custom-kg" placeholder="e.g. 7" min="0.1" step="0.5">
+      <span>kg dry flour</span>
     </div>
   </div>
 
@@ -575,12 +653,21 @@
 </footer>
 
 <script>
+  // ── Liturgy Data ──
+  const LITURGY = {
+    tuesday:  { label: "Tuesday's Liturgy",    flour: 3,    size: '250–280 g',     min: 12, note: null },
+    thursday: { label: "Thursday's Liturgy",   flour: 4,    size: '325–350 g',     min: 18, note: 'Increase size and quantity during kids summer camp.' },
+    saturday: { label: "Saturday's Liturgy",   flour: 7,    size: '600–650 g',     min: 15, note: null },
+    sunday1:  { label: "Sunday 1st Liturgy",   flour: null, size: '350–400 g',     min: 12, note: null },
+    sunday2:  { label: "Sunday 2nd Liturgy",   flour: 30,   size: '1400–1450 g',   min: 28, note: 'For Palm Sunday: increase Orban size to 1550–1600 g and batch size to min 45 kg dry flour.' },
+  };
+
   // ── State ──
   const state = {
     scald: 0.40,
     season: 'winter',
     mode: 'weight',
-    grams: null   // total dough target in grams
+    activePresetFlour: null,
   };
 
   // ── Toggle buttons ──
@@ -589,8 +676,7 @@
       const group = btn.dataset.group;
       document.querySelectorAll(`[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      state[group] = group === 'scald' ? parseFloat(btn.dataset.value) : btn.dataset.value;
-
+      state[group] = btn.dataset.value;
       if (group === 'mode') {
         document.getElementById('weight-panel').style.display = state.mode === 'weight' ? 'block' : 'none';
         document.getElementById('loaves-panel').style.display = state.mode === 'loaves' ? 'block' : 'none';
@@ -598,72 +684,93 @@
     });
   });
 
-  // ── Preset weight buttons ──
-  let activePresetGrams = null;
+  // ── Liturgy selector ──
+  document.querySelectorAll('.liturgy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.liturgy-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const d = LITURGY[btn.dataset.liturgy];
+      document.getElementById('ref-size').textContent  = d.size;
+      document.getElementById('ref-min').textContent   = d.min;
+      document.getElementById('ref-flour').textContent = d.flour ? d.flour + ' kg' : 'Varies';
+      const noteEl = document.getElementById('ref-note');
+      if (d.note) { noteEl.textContent = d.note; noteEl.style.display = 'block'; }
+      else { noteEl.style.display = 'none'; }
+      document.getElementById('liturgy-ref').style.display = 'flex';
+
+      // Auto-fill flour input if a standard amount exists
+      if (d.flour) {
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('custom-kg').value = d.flour;
+        document.getElementById('custom-wrap').style.display = 'flex';
+        state.activePresetFlour = null;
+      }
+    });
+  });
+
+  // ── Preset flour buttons ──
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const g = btn.dataset.grams;
-      if (g === 'custom') {
-        activePresetGrams = null;
+      const f = btn.dataset.flour;
+      if (f === 'custom') {
+        state.activePresetFlour = null;
         document.getElementById('custom-wrap').style.display = 'flex';
       } else {
-        activePresetGrams = parseInt(g);
+        state.activePresetFlour = parseFloat(f);
         document.getElementById('custom-wrap').style.display = 'none';
       }
     });
   });
-  // Show custom input by default (since "Custom" is active)
   document.getElementById('custom-wrap').style.display = 'flex';
 
   // ── Calculate ──
   document.getElementById('calc-btn').addEventListener('click', () => {
-    let totalGrams = 0;
+    let flourKg = 0;
 
     if (state.mode === 'weight') {
-      if (activePresetGrams) {
-        totalGrams = activePresetGrams;
+      if (state.activePresetFlour) {
+        flourKg = state.activePresetFlour;
       } else {
-        const kg = parseFloat(document.getElementById('custom-kg').value);
-        if (!kg || kg <= 0) { alert('Please enter a valid dough weight in kg.'); return; }
-        totalGrams = kg * 1000;
+        flourKg = parseFloat(document.getElementById('custom-kg').value);
+        if (!flourKg || flourKg <= 0) { alert('Please enter a valid dry flour amount in kg.'); return; }
       }
     } else {
+      let totalDoughKg = 0;
       document.querySelectorAll('.loaf-count').forEach(input => {
-        const count = parseInt(input.value) || 0;
-        totalGrams += count * parseInt(input.dataset.grams);
+        totalDoughKg += (parseInt(input.value) || 0) * parseInt(input.dataset.grams) / 1000;
       });
-      if (totalGrams === 0) { alert('Please enter at least one loaf count.'); return; }
+      if (totalDoughKg === 0) { alert('Please enter at least one loaf count.'); return; }
+      flourKg = totalDoughKg / 1.65;
     }
 
-    calculate(totalGrams);
+    calculate(flourKg);
   });
 
   // Ceiling rounded to nearest 0.05 (matches spreadsheet CEILING formula)
   function ceilTo005(x) { return Math.ceil(x / 0.05) * 0.05; }
 
-  function fmtKg(kg)  { return kg >= 1 ? kg.toFixed(3) + ' kg' : (kg * 1000).toFixed(0) + ' g'; }
-  function fmtL(L)    { return L >= 1  ? L.toFixed(3)  + ' L'  : (L  * 1000).toFixed(0) + ' mL'; }
-  function fmtG(g)    { return g.toFixed(1) + ' g'; }
+  function fmtKg(kg) { return kg >= 1 ? kg.toFixed(3) + ' kg' : (kg * 1000).toFixed(0) + ' g'; }
+  function fmtL(L)   { return L  >= 1 ? L.toFixed(3)  + ' L'  : (L  * 1000).toFixed(0) + ' mL'; }
+  function fmtG(g)   { return g.toFixed(1) + ' g'; }
 
-  function calculate(totalGrams) {
-    const totalDough_kg  = totalGrams / 1000;
-    const flourRef_kg    = totalDough_kg / 1.65;          // Dry flour reference
-    const totalWater_L   = flourRef_kg * 0.65;            // 65% of dry flour
+  function calculate(flourKg) {
+    const flourRef_kg   = flourKg;
+    const totalDough_kg = flourKg * 1.65;
+    const totalWater_L  = flourKg * 0.65;
 
-    const scaldWeight_kg  = totalDough_kg * state.scald;  // 40% or 30% of total dough
-    const scaldFlour_kg   = scaldWeight_kg / 2.35;
-    const scaldWater_L    = ceilTo005(scaldWeight_kg - scaldFlour_kg);
+    const scaldWeight_kg = totalDough_kg * state.scald;
+    const scaldFlour_kg  = scaldWeight_kg / 2.35;
+    const scaldWater_L   = ceilTo005(scaldWeight_kg - scaldFlour_kg);
 
-    const batch2Flour_kg  = flourRef_kg - scaldFlour_kg;
-    const batch2Water_L   = totalWater_L - scaldWater_L;
+    const batch2Flour_kg = flourRef_kg - scaldFlour_kg;
+    const batch2Water_L  = totalWater_L - scaldWater_L;
 
     const yeast_g = state.season === 'winter'
-      ? totalDough_kg * 4    // 4 g per kg — Winter
-      : totalDough_kg * 3;   // 3 g per kg — Summer
+      ? totalDough_kg * 4
+      : totalDough_kg * 3;
 
-    // Populate batches
     document.getElementById('b1-flour').textContent = fmtKg(scaldFlour_kg);
     document.getElementById('b1-water').textContent = fmtL(scaldWater_L);
     document.getElementById('b1-total').textContent = fmtKg(scaldWeight_kg);
@@ -671,14 +778,12 @@
     document.getElementById('b2-water').textContent = fmtL(batch2Water_L);
     document.getElementById('b2-yeast').textContent = fmtG(yeast_g);
 
-    // Totals
     document.getElementById('tot-flour').textContent = fmtKg(flourRef_kg);
     document.getElementById('tot-water').textContent = fmtL(totalWater_L);
     document.getElementById('tot-dough').textContent = fmtKg(totalDough_kg);
 
-    // Summary line
     document.getElementById('results-summary').textContent =
-      `${fmtKg(totalDough_kg)} dough · ${Math.round(state.scald * 100)}% scald · ${state.season === 'winter' ? 'Winter' : 'Summer'} yeast`;
+      `${fmtKg(flourRef_kg)} dry flour · 40% scald · ${state.season === 'winter' ? 'Winter' : 'Summer'} yeast`;
 
     // Loaf table
     const sizes = [
