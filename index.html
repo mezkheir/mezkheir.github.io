@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMSV Korban Ministry – Bread Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brown-dark:   #5C2E0E;
+      --brown-mid:    #8B4A1E;
+      --amber:        #C8822A;
+      --amber-light:  #E5A84A;
+      --cream:        #FDF6EE;
+      --cream-mid:    #F5E6D3;
+      --cream-border: #E0C9A8;
+      --white:        #FFFFFF;
+      --text-dark:    #3A1A08;
+      --text-mid:     #6B3F20;
+      --text-light:   #9A6B45;
+      --success:      #4A7C59;
+      --radius:       12px;
+      --radius-sm:    8px;
+      --shadow:       0 4px 20px rgba(92,46,14,0.10);
+      --shadow-lg:    0 8px 32px rgba(92,46,14,0.15);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 100%);
+      color: var(--white);
+      text-align: center;
+      padding: 2.5rem 1.5rem 2rem;
+    }
+    header .cross {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+    header h1 {
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    header h1 span {
+      color: var(--amber-light);
+    }
+    header p {
+      margin-top: 0.4rem;
+      font-size: 0.95rem;
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    /* ── Main Layout ── */
+    main {
+      flex: 1;
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--cream-border);
+    }
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+
+    /* ── Toggle Groups ── */
+    .toggle-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .toggle-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 0.65rem 1rem;
+      border: 2px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      color: var(--text-mid);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+    .toggle-btn:hover {
+      border-color: var(--amber);
+      color: var(--brown-dark);
+    }
+    .toggle-btn.active {
+      background: var(--brown-dark);
+      border-color: var(--brown-dark);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(92,46,14,0.25);
+    }
+
+    /* ── Settings Row ── */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 500px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+    .setting-item label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Preset Weight Buttons ── */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 400px) {
+      .preset-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .preset-btn {
+      padding: 0.75rem 0.5rem;
+      border: 2px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+    .preset-btn:hover { border-color: var(--amber); color: var(--brown-dark); }
+    .preset-btn.active {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(200,130,42,0.3);
+    }
+
+    /* ── Custom Input ── */
+    .custom-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .custom-input-wrap input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      transition: border-color 0.18s;
+      outline: none;
+    }
+    .custom-input-wrap input:focus { border-color: var(--amber); background: var(--white); }
+    .custom-input-wrap span {
+      font-weight: 600;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    /* ── Loaf Count Mode ── */
+    .loaf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .loaf-item label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 0.35rem;
+    }
+    .loaf-item input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 2px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      color: var(--text-dark);
+      background: var(--cream);
+      outline: none;
+      transition: border-color 0.18s;
+    }
+    .loaf-item input:focus { border-color: var(--amber); background: var(--white); }
+
+    /* ── Calculate Button ── */
+    .calc-btn {
+      width: 100%;
+      padding: 1.1rem;
+      background: linear-gradient(135deg, var(--brown-dark), var(--brown-mid));
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .calc-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 36px rgba(92,46,14,0.22); }
+    .calc-btn:active { transform: translateY(0); }
+
+    /* ── Results ── */
+    #results { display: none; }
+    #results.visible { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .results-header {
+      text-align: center;
+      padding: 0.5rem 0;
+    }
+    .results-header h2 {
+      font-size: 1.1rem;
+      color: var(--brown-dark);
+      font-weight: 700;
+    }
+    .results-header p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 0.2rem;
+    }
+
+    .batch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 480px) { .batch-grid { grid-template-columns: 1fr; } }
+
+    .batch-card {
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      border: 1px solid var(--cream-border);
+    }
+    .batch-card.batch1 { background: linear-gradient(135deg, #FFF4E6, #FDE8C8); }
+    .batch-card.batch2 { background: linear-gradient(135deg, #F0F7F4, #DFF0E8); }
+
+    .batch-card h3 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+    }
+    .batch-card.batch1 h3 { color: #8B4A00; }
+    .batch-card.batch2 h3 { color: #2D6645; }
+
+    .batch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-size: 0.9rem;
+    }
+    .batch-row:last-child { border-bottom: none; }
+    .batch-row .label { color: var(--text-mid); }
+    .batch-row .value {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-dark);
+    }
+
+    /* ── Totals Card ── */
+    .totals-card { background: var(--brown-dark); color: var(--white); }
+    .totals-card .card-title { color: rgba(255,255,255,0.6); }
+    .totals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      text-align: center;
+    }
+    @media (max-width: 400px) { .totals-grid { grid-template-columns: repeat(2, 1fr); } }
+    .total-item .t-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--amber-light);
+      line-height: 1;
+    }
+    .total-item .t-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.65);
+      margin-top: 0.3rem;
+    }
+
+    /* ── Loaf Table ── */
+    .loaf-table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--cream-mid);
+      color: var(--text-mid);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      border-bottom: 2px solid var(--cream-border);
+    }
+    td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--cream-border);
+      color: var(--text-dark);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--cream); }
+    td.count { font-weight: 700; color: var(--brown-dark); font-size: 1rem; }
+
+    /* ── Instructions ── */
+    .instructions-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .instructions-list li {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+    .step-num {
+      min-width: 1.6rem;
+      height: 1.6rem;
+      background: var(--amber);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    /* ── Note Banner ── */
+    .note-banner {
+      background: #FFF8E6;
+      border: 1px solid #F0CF80;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      font-size: 0.88rem;
+      color: #7A5500;
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    .note-banner .icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--brown-dark);
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.88rem;
+      font-style: italic;
+    }
+    footer strong { color: var(--amber-light); font-style: normal; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="cross">✝</div>
+  <h1>SMSV <span>Korban</span> Ministry</h1>
+  <p>Bread Recipe Calculator</p>
+</header>
+
+<main>
+
+  <!-- Settings -->
+  <div class="card">
+    <div class="card-title">Settings</div>
+    <div class="settings-grid">
+
+      <div class="setting-item">
+        <label>Scald Ratio</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-group="scald" data-value="0.30">30%</button>
+          <button class="toggle-btn" data-group="scald" data-value="0.40">40%</button>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>Season</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-group="season" data-value="winter">Winter</button>
+          <button class="toggle-btn" data-group="season" data-value="summer">Summer</button>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label>Plan By</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-group="mode" data-value="weight">Weight</button>
+          <button class="toggle-btn" data-group="mode" data-value="loaves">Loaves</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Input: By Weight -->
+  <div class="card" id="weight-panel">
+    <div class="card-title">Target Dough Weight</div>
+    <div class="preset-grid">
+      <button class="preset-btn" data-grams="250">250 g</button>
+      <button class="preset-btn" data-grams="500">500 g</button>
+      <button class="preset-btn" data-grams="750">750 g</button>
+      <button class="preset-btn" data-grams="1000">1 kg</button>
+      <button class="preset-btn" data-grams="1500">1.5 kg</button>
+      <button class="preset-btn" data-grams="2000">2 kg</button>
+      <button class="preset-btn" data-grams="3000">3 kg</button>
+      <button class="preset-btn" data-grams="5000">5 kg</button>
+      <button class="preset-btn active" data-grams="custom">Custom</button>
+    </div>
+    <div class="custom-input-wrap" id="custom-wrap">
+      <input type="number" id="custom-kg" placeholder="e.g. 4.5" min="0.1" step="0.1">
+      <span>kg total dough</span>
+    </div>
+  </div>
+
+  <!-- Input: By Loaves -->
+  <div class="card" id="loaves-panel" style="display:none;">
+    <div class="card-title">Number of Loaves by Size</div>
+    <div class="loaf-grid">
+      <div class="loaf-item">
+        <label>Small – 250 g each</label>
+        <input type="number" class="loaf-count" data-grams="250" placeholder="0" min="0">
+      </div>
+      <div class="loaf-item">
+        <label>Medium – 500 g each</label>
+        <input type="number" class="loaf-count" data-grams="500" placeholder="0" min="0">
+      </div>
+      <div class="loaf-item">
+        <label>Large – 750 g each</label>
+        <input type="number" class="loaf-count" data-grams="750" placeholder="0" min="0">
+      </div>
+      <div class="loaf-item">
+        <label>Extra Large – 1000 g each</label>
+        <input type="number" class="loaf-count" data-grams="1000" placeholder="0" min="0">
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculate -->
+  <button class="calc-btn" id="calc-btn">Calculate Recipe →</button>
+
+  <!-- Results -->
+  <div id="results">
+
+    <div class="results-header">
+      <h2>Your Recipe</h2>
+      <p id="results-summary"></p>
+    </div>
+
+    <!-- Batches -->
+    <div class="batch-grid">
+      <div class="batch-card batch1">
+        <h3>🌡 Batch 1 – Scald</h3>
+        <div class="batch-row"><span class="label">Dry Flour</span><span class="value" id="b1-flour">—</span></div>
+        <div class="batch-row"><span class="label">Boiling Water</span><span class="value" id="b1-water">—</span></div>
+        <div class="batch-row"><span class="label">Scald Dough Wt.</span><span class="value" id="b1-total">—</span></div>
+      </div>
+      <div class="batch-card batch2">
+        <h3>🌿 Batch 2 – Mix</h3>
+        <div class="batch-row"><span class="label">Dry Flour</span><span class="value" id="b2-flour">—</span></div>
+        <div class="batch-row"><span class="label">Warm Water</span><span class="value" id="b2-water">—</span></div>
+        <div class="batch-row"><span class="label">Yeast</span><span class="value" id="b2-yeast">—</span></div>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="card totals-card">
+      <div class="card-title">Totals</div>
+      <div class="totals-grid">
+        <div class="total-item">
+          <div class="t-value" id="tot-flour">—</div>
+          <div class="t-label">Total Flour</div>
+        </div>
+        <div class="total-item">
+          <div class="t-value" id="tot-water">—</div>
+          <div class="t-label">Total Water</div>
+        </div>
+        <div class="total-item">
+          <div class="t-value" id="tot-dough">—</div>
+          <div class="t-label">Dough Weight</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loaf Table -->
+    <div class="card">
+      <div class="card-title">Possible Loaf Counts from This Batch</div>
+      <div class="loaf-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Size</th>
+              <th>Weight Each</th>
+              <th>Loaves You Can Make</th>
+            </tr>
+          </thead>
+          <tbody id="loaf-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Instructions -->
+  <div class="card">
+    <div class="card-title">Step-by-Step Instructions</div>
+    <ul class="instructions-list">
+      <li><div class="step-num">1</div><span>Prepare <strong>Batch 1</strong>: combine scald flour with boiling water. Mix well for <strong>15 minutes</strong>.</span></li>
+      <li><div class="step-num">2</div><span>Allow Batch 1 to cool for a <strong>minimum of 30 minutes</strong> before continuing.</span></li>
+      <li><div class="step-num">3</div><span>Prepare <strong>Batch 2</strong>: dissolve yeast in warm water, then combine with remaining flour.</span></li>
+      <li><div class="step-num">4</div><span>Combine both batches and knead until a smooth, elastic dough forms.</span></li>
+      <li><div class="step-num">5</div><span>Allow dough to proof, shape into loaves, and bake as directed.</span></li>
+    </ul>
+  </div>
+
+  <!-- Note -->
+  <div class="note-banner">
+    <span class="icon">⚠️</span>
+    <span><strong>Important:</strong> Only use <strong>Costco flour</strong> for this recipe. Results may vary with other flour brands.</span>
+  </div>
+
+</main>
+
+<footer>
+  <strong>SMSV Korban Ministry</strong><br>
+  God bless your service ✝
+</footer>
+
+<script>
+  // ── State ──
+  const state = {
+    scald: 0.30,
+    season: 'winter',
+    mode: 'weight',
+    grams: null   // total dough target in grams
+  };
+
+  // ── Toggle buttons ──
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const group = btn.dataset.group;
+      document.querySelectorAll(`[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state[group] = group === 'scald' ? parseFloat(btn.dataset.value) : btn.dataset.value;
+
+      if (group === 'mode') {
+        document.getElementById('weight-panel').style.display = state.mode === 'weight' ? 'block' : 'none';
+        document.getElementById('loaves-panel').style.display = state.mode === 'loaves' ? 'block' : 'none';
+      }
+    });
+  });
+
+  // ── Preset weight buttons ──
+  let activePresetGrams = null;
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const g = btn.dataset.grams;
+      if (g === 'custom') {
+        activePresetGrams = null;
+        document.getElementById('custom-wrap').style.display = 'flex';
+      } else {
+        activePresetGrams = parseInt(g);
+        document.getElementById('custom-wrap').style.display = 'none';
+      }
+    });
+  });
+  // Show custom input by default (since "Custom" is active)
+  document.getElementById('custom-wrap').style.display = 'flex';
+
+  // ── Calculate ──
+  document.getElementById('calc-btn').addEventListener('click', () => {
+    let totalGrams = 0;
+
+    if (state.mode === 'weight') {
+      if (activePresetGrams) {
+        totalGrams = activePresetGrams;
+      } else {
+        const kg = parseFloat(document.getElementById('custom-kg').value);
+        if (!kg || kg <= 0) { alert('Please enter a valid dough weight in kg.'); return; }
+        totalGrams = kg * 1000;
+      }
+    } else {
+      document.querySelectorAll('.loaf-count').forEach(input => {
+        const count = parseInt(input.value) || 0;
+        totalGrams += count * parseInt(input.dataset.grams);
+      });
+      if (totalGrams === 0) { alert('Please enter at least one loaf count.'); return; }
+    }
+
+    calculate(totalGrams);
+  });
+
+  // Ceiling rounded to nearest 0.05 (matches spreadsheet CEILING formula)
+  function ceilTo005(x) { return Math.ceil(x / 0.05) * 0.05; }
+
+  function fmtKg(kg)  { return kg >= 1 ? kg.toFixed(3) + ' kg' : (kg * 1000).toFixed(0) + ' g'; }
+  function fmtL(L)    { return L >= 1  ? L.toFixed(3)  + ' L'  : (L  * 1000).toFixed(0) + ' mL'; }
+  function fmtG(g)    { return g.toFixed(1) + ' g'; }
+
+  function calculate(totalGrams) {
+    const totalDough_kg  = totalGrams / 1000;
+    const flourRef_kg    = totalDough_kg / 1.65;          // Dry flour reference
+    const totalWater_L   = flourRef_kg * 0.65;            // 65% of dry flour
+
+    const scaldWeight_kg  = totalDough_kg * state.scald;  // 40% or 30% of total dough
+    const scaldFlour_kg   = scaldWeight_kg / 2.35;
+    const scaldWater_L    = ceilTo005(scaldWeight_kg - scaldFlour_kg);
+
+    const batch2Flour_kg  = flourRef_kg - scaldFlour_kg;
+    const batch2Water_L   = totalWater_L - scaldWater_L;
+
+    const yeast_g = state.season === 'winter'
+      ? totalDough_kg * 4    // 4 g per kg — Winter
+      : totalDough_kg * 3;   // 3 g per kg — Summer
+
+    // Populate batches
+    document.getElementById('b1-flour').textContent = fmtKg(scaldFlour_kg);
+    document.getElementById('b1-water').textContent = fmtL(scaldWater_L);
+    document.getElementById('b1-total').textContent = fmtKg(scaldWeight_kg);
+    document.getElementById('b2-flour').textContent = fmtKg(batch2Flour_kg);
+    document.getElementById('b2-water').textContent = fmtL(batch2Water_L);
+    document.getElementById('b2-yeast').textContent = fmtG(yeast_g);
+
+    // Totals
+    document.getElementById('tot-flour').textContent = fmtKg(flourRef_kg);
+    document.getElementById('tot-water').textContent = fmtL(totalWater_L);
+    document.getElementById('tot-dough').textContent = fmtKg(totalDough_kg);
+
+    // Summary line
+    document.getElementById('results-summary').textContent =
+      `${fmtKg(totalDough_kg)} dough · ${Math.round(state.scald * 100)}% scald · ${state.season === 'winter' ? 'Winter' : 'Summer'} yeast`;
+
+    // Loaf table
+    const sizes = [
+      { label: 'Small',       g: 250  },
+      { label: 'Medium',      g: 500  },
+      { label: 'Large',       g: 750  },
+      { label: 'Extra Large', g: 1000 },
+      { label: 'Jumbo',       g: 1300 },
+    ];
+    const tbody = document.getElementById('loaf-table-body');
+    tbody.innerHTML = '';
+    sizes.forEach(s => {
+      const count = Math.floor(totalGrams / s.g);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${s.label}</td>
+        <td>${s.g} g</td>
+        <td class="count">${count}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Show results
+    const resultsEl = document.getElementById('results');
+    resultsEl.classList.add('visible');
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>
