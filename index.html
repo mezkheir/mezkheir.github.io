@@ -748,24 +748,31 @@
       return;
     }
 
-    let totalFlour = 0, totalMin = 0, noteLines = [], summaryLines = [];
+    let totalFlour = 0, totalMin = 0, rows = [];
     selectedDays.forEach(key => {
       const d = LITURGY[key];
       totalFlour += d.flour || 0;
       totalMin   += d.min;
-      summaryLines.push(`${d.label}: ${d.size} (min ${d.min})`);
-      if (d.note) noteLines.push(d.note);
+      rows.push({ label: d.label, size: d.size, min: d.min, note: d.note });
     });
 
     document.getElementById('ref-flour').textContent = totalFlour ? totalFlour + ' kg' : 'Varies';
     document.getElementById('ref-min').textContent   = totalMin;
-    document.getElementById('ref-size').textContent  = selectedDays.size > 1 ? 'Combined' : LITURGY[[...selectedDays][0]].size;
+    document.getElementById('ref-size').textContent  = selectedDays.size > 1 ? 'Combined' : rows[0].size;
 
     const noteEl = document.getElementById('ref-note');
-    const allNotes = [...summaryLines, ...(noteLines.length ? ['', ...noteLines] : [])].join('\n');
-    if (selectedDays.size > 1) { noteEl.textContent = allNotes; noteEl.style.display = 'block'; }
-    else if (noteLines.length) { noteEl.textContent = noteLines[0]; noteEl.style.display = 'block'; }
-    else { noteEl.style.display = 'none'; }
+    if (selectedDays.size > 1) {
+      noteEl.innerHTML = rows.map(r => {
+        const special = r.note ? `<br><em style="font-size:0.78rem;opacity:0.8;">${r.note}</em>` : '';
+        return `<strong>${r.label}:</strong> ${r.size} &nbsp;·&nbsp; min ${r.min}${special}`;
+      }).join('<br><br>');
+      noteEl.style.display = 'block';
+    } else if (rows[0].note) {
+      noteEl.textContent = rows[0].note;
+      noteEl.style.display = 'block';
+    } else {
+      noteEl.style.display = 'none';
+    }
 
     document.getElementById('liturgy-ref').style.display = 'flex';
     if (totalFlour > 0) document.getElementById('custom-kg').value = totalFlour;
