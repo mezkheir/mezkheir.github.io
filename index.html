@@ -19,9 +19,45 @@
       --text-dark:    #3A1A08;
       --text-mid:     #6B3F20;
       --text-light:   #9A6B45;
-      --success:      #4A7C59;
       --radius:       12px;
       --radius-sm:    8px;
+      --shadow:       0 4px 20px rgba(92,46,14,0.10);
+      --shadow-lg:    0 8px 32px rgba(92,46,14,0.15);
+    }
+
+    /* ── Dark mode ── */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --cream:        #1C0F07;
+        --cream-mid:    #2A1A0E;
+        --cream-border: #3D2515;
+        --white:        #241408;
+        --text-dark:    #F0E0CC;
+        --text-mid:     #C4956A;
+        --text-light:   #8A6545;
+        --shadow:       0 4px 20px rgba(0,0,0,0.4);
+        --shadow-lg:    0 8px 32px rgba(0,0,0,0.5);
+      }
+    }
+    [data-theme="dark"] {
+      --cream:        #1C0F07;
+      --cream-mid:    #2A1A0E;
+      --cream-border: #3D2515;
+      --white:        #241408;
+      --text-dark:    #F0E0CC;
+      --text-mid:     #C4956A;
+      --text-light:   #8A6545;
+      --shadow:       0 4px 20px rgba(0,0,0,0.4);
+      --shadow-lg:    0 8px 32px rgba(0,0,0,0.5);
+    }
+    [data-theme="light"] {
+      --cream:        #FDF6EE;
+      --cream-mid:    #F5E6D3;
+      --cream-border: #E0C9A8;
+      --white:        #FFFFFF;
+      --text-dark:    #3A1A08;
+      --text-mid:     #6B3F20;
+      --text-light:   #9A6B45;
       --shadow:       0 4px 20px rgba(92,46,14,0.10);
       --shadow-lg:    0 8px 32px rgba(92,46,14,0.15);
     }
@@ -61,6 +97,23 @@
       opacity: 0.8;
       font-style: italic;
     }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 2rem;
+      padding: 0.35rem 0.75rem;
+      color: white;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+    header { position: relative; }
 
     /* ── Main Layout ── */
     main {
@@ -443,6 +496,25 @@
       margin-top: 0.25rem;
     }
 
+    /* ── Mixer Batches ── */
+    .mixer-batch {
+      border: 1px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      background: var(--cream);
+    }
+    .mixer-batch:last-child { margin-bottom: 0; }
+    .mixer-batch h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+      margin-bottom: 0.6rem;
+    }
+    .mixer-batch .batch-row { font-size: 0.9rem; }
+
     /* ── Note Banner ── */
     .note-banner {
       background: #FFF8E6;
@@ -472,6 +544,7 @@
 <body>
 
 <header>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
   <div class="cross">✝</div>
   <h1>SMSV <span>Korban</span> Ministry</h1>
   <p>Bread Recipe Calculator</p>
@@ -479,27 +552,12 @@
 
 <main>
 
-  <!-- Settings -->
-  <div class="card">
-    <div class="card-title">Settings</div>
-    <div class="settings-grid">
-
-<div class="setting-item">
-        <label>Season</label>
-        <div class="toggle-group">
-          <button class="toggle-btn active" data-group="season" data-value="winter">Winter</button>
-          <button class="toggle-btn" data-group="season" data-value="summer">Summer</button>
-        </div>
-      </div>
-
-      <div class="setting-item">
-        <label>Plan By</label>
-        <div class="toggle-group">
-          <button class="toggle-btn active" data-group="mode" data-value="weight">Weight</button>
-          <button class="toggle-btn" data-group="mode" data-value="loaves">Loaves</button>
-        </div>
-      </div>
-
+<!-- Mode Selector -->
+  <div class="card mode-selector-card">
+    <div class="card-title">What are you making?</div>
+    <div class="toggle-group">
+      <button class="toggle-btn mode-btn active" data-mode="scald">🌡 Scalding Dough Only</button>
+      <button class="toggle-btn mode-btn" data-mode="bread">🍞 Full Bread Recipe</button>
     </div>
   </div>
 
@@ -510,8 +568,7 @@
       <button class="liturgy-btn" data-liturgy="tuesday">Tuesday<br>Liturgy</button>
       <button class="liturgy-btn" data-liturgy="thursday">Thursday<br>Liturgy</button>
       <button class="liturgy-btn" data-liturgy="saturday">Saturday<br>Liturgy</button>
-      <button class="liturgy-btn" data-liturgy="sunday1">Sunday<br>1st Liturgy</button>
-      <button class="liturgy-btn" data-liturgy="sunday2">Sunday<br>2nd Liturgy</button>
+      <button class="liturgy-btn" data-liturgy="sunday">Sunday<br>Liturgy</button>
     </div>
     <div id="liturgy-ref" style="display:none;" class="liturgy-ref-box">
       <div class="liturgy-ref-item">
@@ -540,29 +597,8 @@
   </div>
 
   <!-- Input: By Loaves -->
-  <div class="card" id="loaves-panel" style="display:none;">
-    <div class="card-title">Number of Loaves by Size</div>
-    <div class="loaf-grid">
-      <div class="loaf-item">
-        <label>Small – 250 g each</label>
-        <input type="number" class="loaf-count" data-grams="250" placeholder="0" min="0">
-      </div>
-      <div class="loaf-item">
-        <label>Medium – 500 g each</label>
-        <input type="number" class="loaf-count" data-grams="500" placeholder="0" min="0">
-      </div>
-      <div class="loaf-item">
-        <label>Large – 750 g each</label>
-        <input type="number" class="loaf-count" data-grams="750" placeholder="0" min="0">
-      </div>
-      <div class="loaf-item">
-        <label>Extra Large – 1000 g each</label>
-        <input type="number" class="loaf-count" data-grams="1000" placeholder="0" min="0">
-      </div>
-    </div>
-  </div>
 
-  <!-- Calculate -->
+<!-- Calculate -->
   <button class="calc-btn" id="calc-btn">Calculate Recipe →</button>
 
   <!-- Results -->
@@ -575,22 +611,23 @@
 
     <!-- Batches -->
     <div class="batch-grid">
-      <div class="batch-card batch1">
+      <div class="batch-card batch1" id="batch1-card">
         <h3>🌡 Batch 1 – Scald</h3>
         <div class="batch-row"><span class="label">Dry Flour</span><span class="value" id="b1-flour">—</span></div>
         <div class="batch-row"><span class="label">Boiling Water</span><span class="value" id="b1-water">—</span></div>
         <div class="batch-row"><span class="label">Scald Dough Wt.</span><span class="value" id="b1-total">—</span></div>
       </div>
-      <div class="batch-card batch2">
+      <div class="batch-card batch2" id="batch2-card">
         <h3>🌿 Batch 2 – Mix</h3>
+        <div class="batch-row"><span class="label">Scald Dough to Add</span><span class="value" id="b2-scald">—</span></div>
         <div class="batch-row"><span class="label">Dry Flour</span><span class="value" id="b2-flour">—</span></div>
-        <div class="batch-row"><span class="label">Warm Water</span><span class="value" id="b2-water">—</span></div>
+        <div class="batch-row"><span class="label">Cold Water</span><span class="value" id="b2-water">—</span></div>
         <div class="batch-row"><span class="label">Yeast</span><span class="value" id="b2-yeast">—</span></div>
       </div>
     </div>
 
     <!-- Totals -->
-    <div class="card totals-card">
+    <div class="card totals-card" id="totals-card">
       <div class="card-title">Totals</div>
       <div class="totals-grid">
         <div class="total-item">
@@ -609,7 +646,7 @@
     </div>
 
     <!-- Loaf Table -->
-    <div class="card">
+    <div class="card" id="loaf-table-card">
       <div class="card-title">Possible Loaf Counts from This Batch</div>
       <div class="loaf-table-wrap">
         <table>
@@ -623,6 +660,12 @@
           <tbody id="loaf-table-body"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Mixer Batches -->
+    <div class="card" id="mixer-batches-card" style="display:none;">
+      <div class="card-title">Mixer Batches <span id="mixer-batch-count" style="color:var(--amber);font-size:1rem;"></span></div>
+      <div id="mixer-batches-list"></div>
     </div>
 
   </div>
@@ -653,98 +696,103 @@
 </footer>
 
 <script>
+  // ── Theme toggle ──
+  const html        = document.documentElement;
+  const themeBtn    = document.getElementById('theme-toggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function applyTheme(dark) {
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    themeBtn.textContent = dark ? '☀️ Light' : '🌙 Dark';
+  }
+
+  applyTheme(prefersDark.matches);
+  prefersDark.addEventListener('change', e => applyTheme(e.matches));
+  themeBtn.addEventListener('click', () => applyTheme(html.getAttribute('data-theme') !== 'dark'));
+
   // ── Liturgy Data ──
   const LITURGY = {
     tuesday:  { label: "Tuesday's Liturgy",    flour: 3,    size: '250–280 g',     min: 12, note: null },
     thursday: { label: "Thursday's Liturgy",   flour: 4,    size: '325–350 g',     min: 18, note: 'Increase size and quantity during kids summer camp.' },
     saturday: { label: "Saturday's Liturgy",   flour: 7,    size: '600–650 g',     min: 15, note: null },
-    sunday1:  { label: "Sunday 1st Liturgy",   flour: null, size: '350–400 g',     min: 12, note: null },
-    sunday2:  { label: "Sunday 2nd Liturgy",   flour: 30,   size: '1400–1450 g',   min: 28, note: 'For Palm Sunday: increase Orban size to 1550–1600 g and batch size to min 45 kg dry flour.' },
+    sunday:   { label: "Sunday Liturgy",        flour: 30,   size: '40 total',      min: 40, note: '1st Liturgy: 12 loaves × 350–400 g · 2nd Liturgy: 28 loaves × 1400–1450 g. Palm Sunday: increase to 1550–1600 g and min 45 kg dry flour.' },
   };
 
   // ── State ──
-  const state = {
-    scald: 0.40,
-    season: 'winter',
-    mode: 'weight',
-    activePresetFlour: null,
-  };
+  const state = { scald: 0.40, season: 'summer', mode: 'scald' };
 
-  // ── Toggle buttons ──
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
+  // ── Mode selector ──
+  let selectedDays = new Set();
+
+  function clearLiturgySelection() {
+    selectedDays.clear();
+    document.querySelectorAll('.liturgy-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('liturgy-ref').style.display = 'none';
+    document.getElementById('custom-kg').value = '';
+  }
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const group = btn.dataset.group;
-      document.querySelectorAll(`[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      state[group] = btn.dataset.value;
-      if (group === 'mode') {
-        document.getElementById('weight-panel').style.display = state.mode === 'weight' ? 'block' : 'none';
-        document.getElementById('loaves-panel').style.display = state.mode === 'loaves' ? 'block' : 'none';
-      }
+      state.mode = btn.dataset.mode;
+      clearLiturgySelection();
     });
   });
 
   // ── Liturgy selector ──
+  function updateLiturgyRef() {
+    if (selectedDays.size === 0) {
+      document.getElementById('liturgy-ref').style.display = 'none';
+      document.getElementById('custom-kg').value = '';
+      return;
+    }
+
+    let totalFlour = 0, totalMin = 0, noteLines = [], summaryLines = [];
+    selectedDays.forEach(key => {
+      const d = LITURGY[key];
+      totalFlour += d.flour || 0;
+      totalMin   += d.min;
+      summaryLines.push(`${d.label}: ${d.size} (min ${d.min})`);
+      if (d.note) noteLines.push(d.note);
+    });
+
+    document.getElementById('ref-flour').textContent = totalFlour ? totalFlour + ' kg' : 'Varies';
+    document.getElementById('ref-min').textContent   = totalMin;
+    document.getElementById('ref-size').textContent  = selectedDays.size > 1 ? 'Combined' : LITURGY[[...selectedDays][0]].size;
+
+    const noteEl = document.getElementById('ref-note');
+    const allNotes = [...summaryLines, ...(noteLines.length ? ['', ...noteLines] : [])].join('\n');
+    if (selectedDays.size > 1) { noteEl.textContent = allNotes; noteEl.style.display = 'block'; }
+    else if (noteLines.length) { noteEl.textContent = noteLines[0]; noteEl.style.display = 'block'; }
+    else { noteEl.style.display = 'none'; }
+
+    document.getElementById('liturgy-ref').style.display = 'flex';
+    if (totalFlour > 0) document.getElementById('custom-kg').value = totalFlour;
+  }
+
   document.querySelectorAll('.liturgy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.liturgy-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const d = LITURGY[btn.dataset.liturgy];
-      document.getElementById('ref-size').textContent  = d.size;
-      document.getElementById('ref-min').textContent   = d.min;
-      document.getElementById('ref-flour').textContent = d.flour ? d.flour + ' kg' : 'Varies';
-      const noteEl = document.getElementById('ref-note');
-      if (d.note) { noteEl.textContent = d.note; noteEl.style.display = 'block'; }
-      else { noteEl.style.display = 'none'; }
-      document.getElementById('liturgy-ref').style.display = 'flex';
-
-      // Auto-fill flour input if a standard amount exists
-      if (d.flour) {
-        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('custom-kg').value = d.flour;
-        document.getElementById('custom-wrap').style.display = 'flex';
-        state.activePresetFlour = null;
-      }
-    });
-  });
-
-  // ── Preset flour buttons ──
-  document.querySelectorAll('.preset-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const f = btn.dataset.flour;
-      if (f === 'custom') {
-        state.activePresetFlour = null;
-        document.getElementById('custom-wrap').style.display = 'flex';
+      const key = btn.dataset.liturgy;
+      if (state.mode === 'scald') {
+        // Multi-select: toggle
+        if (selectedDays.has(key)) { selectedDays.delete(key); btn.classList.remove('active'); }
+        else { selectedDays.add(key); btn.classList.add('active'); }
       } else {
-        state.activePresetFlour = parseFloat(f);
-        document.getElementById('custom-wrap').style.display = 'none';
+        // Single-select: one at a time
+        document.querySelectorAll('.liturgy-btn').forEach(b => b.classList.remove('active'));
+        selectedDays.clear();
+        selectedDays.add(key);
+        btn.classList.add('active');
       }
+      updateLiturgyRef();
     });
   });
-  document.getElementById('custom-wrap').style.display = 'flex';
 
   // ── Calculate ──
   document.getElementById('calc-btn').addEventListener('click', () => {
-    let flourKg = 0;
-
-    if (state.mode === 'weight') {
-      if (state.activePresetFlour) {
-        flourKg = state.activePresetFlour;
-      } else {
-        flourKg = parseFloat(document.getElementById('custom-kg').value);
-        if (!flourKg || flourKg <= 0) { alert('Please enter a valid dry flour amount in kg.'); return; }
-      }
-    } else {
-      let totalDoughKg = 0;
-      document.querySelectorAll('.loaf-count').forEach(input => {
-        totalDoughKg += (parseInt(input.value) || 0) * parseInt(input.dataset.grams) / 1000;
-      });
-      if (totalDoughKg === 0) { alert('Please enter at least one loaf count.'); return; }
-      flourKg = totalDoughKg / 1.65;
-    }
-
+    const flourKg = parseFloat(document.getElementById('custom-kg').value);
+    if (!flourKg || flourKg <= 0) { alert('Please enter a valid dry flour amount in kg.'); return; }
     calculate(flourKg);
   });
 
@@ -774,6 +822,7 @@
     document.getElementById('b1-flour').textContent = fmtKg(scaldFlour_kg);
     document.getElementById('b1-water').textContent = fmtL(scaldWater_L);
     document.getElementById('b1-total').textContent = fmtKg(scaldWeight_kg);
+    document.getElementById('b2-scald').textContent = fmtKg(scaldWeight_kg);
     document.getElementById('b2-flour').textContent = fmtKg(batch2Flour_kg);
     document.getElementById('b2-water').textContent = fmtL(batch2Water_L);
     document.getElementById('b2-yeast').textContent = fmtG(yeast_g);
@@ -796,7 +845,7 @@
     const tbody = document.getElementById('loaf-table-body');
     tbody.innerHTML = '';
     sizes.forEach(s => {
-      const count = Math.floor(totalGrams / s.g);
+      const count = Math.floor((totalDough_kg * 1000) / s.g);
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${s.label}</td>
@@ -806,7 +855,60 @@
       tbody.appendChild(tr);
     });
 
-    // Show results
+    // Show/hide sections based on mode
+    const isScaldOnly = state.mode === 'scald';
+    document.getElementById('batch1-card').style.display     = isScaldOnly ? 'block' : 'none';
+    document.getElementById('batch2-card').style.display     = isScaldOnly ? 'none'  : 'block';
+    document.getElementById('totals-card').style.display     = isScaldOnly ? 'none'  : 'block';
+    document.getElementById('loaf-table-card').style.display = isScaldOnly ? 'none'  : 'block';
+
+    // ── Mixer batch split (max 15 kg dry flour per load) ──
+    // Split based on flour actually entering the mixer per mode:
+    // scald mode → scald dry flour = (flourRef × 1.65 × scald) / 2.35
+    // bread mode → batch 2 flour   = flourRef − scald flour
+    const scaldFlourRatio  = (1.65 * state.scald) / 2.35;
+    const mixerFlourRatio  = isScaldOnly ? scaldFlourRatio : (1 - scaldFlourRatio);
+    const maxFlourPerLoad  = 15 / mixerFlourRatio;
+    const numLoads         = Math.ceil(flourKg / maxFlourPerLoad);
+    const flourPerLoad = flourKg / numLoads;
+
+    const batchCard  = document.getElementById('mixer-batches-card');
+    const batchList  = document.getElementById('mixer-batches-list');
+    const batchCount = document.getElementById('mixer-batch-count');
+
+    batchList.innerHTML = '';
+    batchCount.textContent = `— ${numLoads} load${numLoads > 1 ? 's' : ''}`;
+
+    for (let i = 0; i < numLoads; i++) {
+      const f   = flourPerLoad;
+      const td  = f * 1.65;
+      const sw  = td * state.scald;
+      const sf  = sw / 2.35;
+      const swa = ceilTo005(sw - sf);
+      const b2f = f - sf;
+      const b2w = (f * 0.65) - swa;
+      const y   = td * 3;
+
+      const div = document.createElement('div');
+      div.className = 'mixer-batch';
+      div.innerHTML = `
+        <h4>Load ${i + 1} of ${numLoads} &nbsp;·&nbsp; ${fmtKg(f)} dry flour</h4>
+        ${isScaldOnly ? `
+        <div class="batch-row"><span class="label">Dry Flour</span><span class="value">${fmtKg(sf)}</span></div>
+        <div class="batch-row"><span class="label">Boiling Water</span><span class="value">${fmtL(swa)}</span></div>
+        <div class="batch-row"><span class="label">Scald Dough Wt.</span><span class="value">${fmtKg(sw)}</span></div>
+        ` : `
+        <div class="batch-row"><span class="label">Scald Dough to Add</span><span class="value">${fmtKg(sw)}</span></div>
+        <div class="batch-row"><span class="label">Dry Flour</span><span class="value">${fmtKg(b2f)}</span></div>
+        <div class="batch-row"><span class="label">Cold Water</span><span class="value">${fmtL(b2w)}</span></div>
+        <div class="batch-row"><span class="label">Yeast</span><span class="value">${fmtG(y)}</span></div>
+        `}
+      `;
+      batchList.appendChild(div);
+    }
+
+    batchCard.style.display = 'block';
+
     const resultsEl = document.getElementById('results');
     resultsEl.classList.add('visible');
     resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
