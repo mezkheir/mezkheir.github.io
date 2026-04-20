@@ -368,20 +368,28 @@
     .totals-card .card-title { color: rgba(255,255,255,0.6); }
     .totals-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
       text-align: center;
     }
-    @media (max-width: 400px) { .totals-grid { grid-template-columns: repeat(2, 1fr); } }
+    .total-item {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.75rem;
+    }
     .total-item .t-value {
-      font-size: 1.4rem;
-      font-weight: 800;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
       color: var(--amber-light);
       line-height: 1;
     }
     .total-item .t-label {
       font-size: 0.72rem;
       text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 0.2rem;
       letter-spacing: 0.08em;
       color: rgba(255,255,255,0.65);
       margin-top: 0.3rem;
@@ -458,7 +466,7 @@
     /* ── Liturgy Selector ── */
     .liturgy-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 0.5rem;
       margin-bottom: 0.75rem;
     }
@@ -515,6 +523,31 @@
       border-top: 1px solid var(--cream-border);
       padding-top: 0.5rem;
       margin-top: 0.25rem;
+    }
+
+    /* ── Mixer Batch 2×2 Grid ── */
+    .batch-2x2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .batch-2x2-item {
+      background: var(--white);
+      border: 1px solid var(--cream-border);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.75rem;
+    }
+    .b2-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-light);
+      margin-bottom: 0.2rem;
+    }
+    .b2-val {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brown-dark);
     }
 
     /* ── Mixer Batches ── */
@@ -579,8 +612,8 @@
   <div class="card mode-selector-card">
     <div class="card-title">What are you making?</div>
     <div class="toggle-group">
-      <button class="toggle-btn mode-btn active" data-mode="scald">🌡 Scalding Dough Only</button>
-      <button class="toggle-btn mode-btn" data-mode="bread">🍞 Full Bread Recipe</button>
+      <button class="toggle-btn mode-btn active" data-mode="scald">🌡 Scald Dough</button>
+      <button class="toggle-btn mode-btn" data-mode="bread">🍞 Bread Dough</button>
     </div>
   </div>
 
@@ -588,25 +621,13 @@
   <div class="card">
     <div class="card-title">Select Your Liturgy</div>
     <div class="liturgy-grid">
-      <button class="liturgy-btn" data-liturgy="tuesday">Tuesday<br>Liturgy</button>
-      <button class="liturgy-btn" data-liturgy="thursday">Thursday<br>Liturgy</button>
-      <button class="liturgy-btn" data-liturgy="saturday">Saturday<br>Liturgy</button>
-      <button class="liturgy-btn" data-liturgy="sunday">Sunday<br>Liturgy</button>
+      <button class="liturgy-btn" data-liturgy="tuesday">Tuesday</button>
+      <button class="liturgy-btn" data-liturgy="thursday">Thursday</button>
+      <button class="liturgy-btn" data-liturgy="saturday">Saturday</button>
+      <button class="liturgy-btn" data-liturgy="sunday">Sunday</button>
     </div>
     <div id="liturgy-ref" style="display:none;" class="liturgy-ref-box">
-      <div class="liturgy-ref-item">
-        <div class="ref-val" id="ref-flour">—</div>
-        <div class="ref-lbl">Dry Flour</div>
-      </div>
-      <div class="liturgy-ref-item">
-        <div class="ref-val" id="ref-size">—</div>
-        <div class="ref-lbl">Orban Size</div>
-      </div>
-      <div class="liturgy-ref-item">
-        <div class="ref-val" id="ref-min">—</div>
-        <div class="ref-lbl">Min # of Orban</div>
-      </div>
-      <div class="liturgy-note" id="ref-note" style="display:none;"></div>
+      <div id="liturgy-ref-inner"></div>
     </div>
   </div>
 
@@ -632,21 +653,11 @@
       <p id="results-summary"></p>
     </div>
 
-    <!-- Batches -->
-    <div class="batch-grid">
-      <div class="batch-card batch1" id="batch1-card">
-        <h3>🌡 Batch 1 – Scald</h3>
-        <div class="batch-row"><span class="label">Dry Flour</span><span class="value" id="b1-flour">—</span></div>
-        <div class="batch-row"><span class="label">Boiling Water</span><span class="value" id="b1-water">—</span></div>
-        <div class="batch-row"><span class="label">Scald Dough Wt.</span><span class="value" id="b1-total">—</span></div>
-      </div>
-      <div class="batch-card batch2" id="batch2-card">
-        <h3>🌿 Batch 2 – Mix</h3>
-        <div class="batch-row"><span class="label">Scald Dough to Add</span><span class="value" id="b2-scald">—</span></div>
-        <div class="batch-row"><span class="label">Dry Flour</span><span class="value" id="b2-flour">—</span></div>
-        <div class="batch-row"><span class="label">Cold Water</span><span class="value" id="b2-water">—</span></div>
-        <div class="batch-row"><span class="label">Yeast</span><span class="value" id="b2-yeast">—</span></div>
-      </div>
+
+    <!-- Mixer Batches -->
+    <div class="card" id="mixer-batches-card" style="display:none;">
+      <div class="card-title">Mixer Batches <span id="mixer-batch-count" style="color:var(--amber);font-size:1rem;"></span></div>
+      <div id="mixer-batches-list"></div>
     </div>
 
     <!-- Totals -->
@@ -665,19 +676,11 @@
           <div class="t-value" id="tot-dough">—</div>
           <div class="t-label">Dough Weight</div>
         </div>
+        <div class="total-item">
+          <div class="t-value" id="tot-yeast">—</div>
+          <div class="t-label">Yeast</div>
+        </div>
       </div>
-    </div>
-
-    <!-- Expected Loaves -->
-    <div class="card" id="expected-loaves-card" style="display:none;">
-      <div class="card-title">Expected Loaves for This Liturgy</div>
-      <div id="expected-loaves-body"></div>
-    </div>
-
-    <!-- Mixer Batches -->
-    <div class="card" id="mixer-batches-card" style="display:none;">
-      <div class="card-title">Mixer Batches <span id="mixer-batch-count" style="color:var(--amber);font-size:1rem;"></span></div>
-      <div id="mixer-batches-list"></div>
     </div>
 
     <!-- Loaf Table -->
@@ -703,8 +706,8 @@
   <div class="card">
     <div class="card-title">Step-by-Step Instructions</div>
 
-    <div class="instr-section-label instr-scald">Preparation</div>
-    <ul class="instructions-list instr-scald">
+    <div class="instr-section-label instr-bread">Preparation</div>
+    <ul class="instructions-list instr-bread">
       <li><div class="step-num">P</div><span>Turn on <strong>Proofer</strong> — set humidity to <strong>level 9</strong> and temperature to <strong>110°F</strong>.</span></li>
       <li><div class="step-num">P</div><span>Prepare tray(s), table, tools, and all necessary equipment.</span></li>
     </ul>
@@ -820,6 +823,7 @@
       state.mode = btn.dataset.mode;
       clearLiturgySelection();
       updateInstructions();
+      updateLiturgyRef();
     });
   });
 
@@ -827,45 +831,62 @@
 
   // ── Liturgy selector ──
   function updateLiturgyRef() {
+    const inner = document.getElementById('liturgy-ref-inner');
+    const box   = document.getElementById('liturgy-ref');
+
     if (selectedDays.size === 0) {
-      document.getElementById('liturgy-ref').style.display = 'none';
+      box.style.display = 'none';
       document.getElementById('custom-kg').value = '';
       return;
     }
 
-    let totalFlour = 0, totalMin = 0, rows = [];
+    let totalFlour = 0;
+    const rows = [];
     selectedDays.forEach(key => {
       const d = LITURGY[key];
       totalFlour += d.flour || 0;
-      totalMin   += d.min;
-      rows.push({ label: d.label, size: d.size, min: d.min, note: d.note });
+      rows.push(d);
     });
 
-    document.getElementById('ref-flour').textContent = totalFlour ? totalFlour + ' kg' : 'Varies';
-    document.getElementById('ref-min').textContent   = totalMin;
-    document.getElementById('ref-size').textContent  = selectedDays.size > 1 ? 'Combined' : rows[0].size;
-
-    const noteEl = document.getElementById('ref-note');
-    if (selectedDays.size > 1) {
-      noteEl.innerHTML = rows.map(r => {
-        const special = r.note ? `<br><em style="font-size:0.78rem;opacity:0.8;">${r.note}</em>` : '';
-        return `<strong>${r.label}:</strong> ${r.size} &nbsp;·&nbsp; min ${r.min}${special}`;
-      }).join('<br><br>');
-      noteEl.style.display = 'block';
-    } else if (rows[0].label === 'Sunday Liturgy') {
-      noteEl.innerHTML = `
-        <strong>1st Liturgy:</strong> 12 loaves × 350–400 g<br><br>
-        <strong>2nd Liturgy:</strong> 28 loaves × 1400–1450 g<br><br>
-        <em style="font-size:0.78rem;opacity:0.8;">Palm Sunday: increase to 1550–1600 g and min 45 kg dry flour.</em>`;
-      noteEl.style.display = 'block';
-    } else if (rows[0].note) {
-      noteEl.textContent = rows[0].note;
-      noteEl.style.display = 'block';
+    if (state.mode === 'scald') {
+      // Simple flour-per-day list
+      inner.innerHTML = rows.map(d =>
+        `<div class="batch-row"><span class="label">${d.label}</span><span class="value" style="font-weight:700;">${d.flour} kg dry flour</span></div>`
+      ).join('') +
+      (rows.length > 1
+        ? `<div class="batch-row" style="border-top:1px solid var(--cream-border);margin-top:0.4rem;padding-top:0.4rem;">
+             <span class="label" style="font-weight:700;">Total</span>
+             <span class="value" style="font-weight:700;">${totalFlour} kg dry flour</span>
+           </div>`
+        : '');
     } else {
-      noteEl.style.display = 'none';
+      // Bread mode: batch-row format
+      function dayRows(d) {
+        const batchRow = (label, value) =>
+          `<div class="batch-row"><span class="label">${label}</span><span class="value">${value}</span></div>`;
+        if (d.label === 'Sunday Liturgy') {
+          return batchRow('Dry Flour', `${d.flour} kg`) +
+                 batchRow('1st Liturgy', '12 loaves × 350–400 g') +
+                 batchRow('2nd Liturgy', '28 loaves × 1400–1450 g') +
+                 `<div style="font-size:0.78rem;color:var(--text-light);margin-top:0.4rem;">Palm Sunday: increase to 1550–1600 g and min 45 kg dry flour.</div>`;
+        }
+        let html = batchRow('Dry Flour', `${d.flour} kg`) +
+                   batchRow('Expected Loaves', `${d.min} loaves × ${d.size}`);
+        if (d.note) html += `<div style="font-size:0.78rem;color:var(--text-light);margin-top:0.4rem;">${d.note}</div>`;
+        return html;
+      }
+
+      if (rows.length > 1) {
+        inner.innerHTML = rows.map(d =>
+          `<div style="font-weight:700;color:var(--text-mid);margin-bottom:0.25rem;">${d.label}</div>` +
+          dayRows(d) + `<div style="height:0.5rem;"></div>`
+        ).join('<hr style="border:none;border-top:1px solid var(--cream-border);margin:0.25rem 0;">');
+      } else {
+        inner.innerHTML = dayRows(rows[0]);
+      }
     }
 
-    document.getElementById('liturgy-ref').style.display = 'flex';
+    box.style.display = 'block';
     if (totalFlour > 0) document.getElementById('custom-kg').value = totalFlour;
   }
 
@@ -918,13 +939,8 @@
       ? totalDough_kg * 4
       : totalDough_kg * 3;
 
-    document.getElementById('b1-flour').textContent = fmtKg(scaldFlour_kg);
-    document.getElementById('b1-water').textContent = fmtL(scaldWater_L);
-    document.getElementById('b1-total').textContent = fmtKg(scaldWeight_kg);
-    document.getElementById('b2-scald').textContent = fmtKg(scaldWeight_kg);
-    document.getElementById('b2-flour').textContent = fmtKg(batch2Flour_kg);
-    document.getElementById('b2-water').textContent = fmtL(batch2Water_L);
-    document.getElementById('b2-yeast').textContent = fmtG(yeast_g);
+
+    document.getElementById('tot-yeast').textContent = fmtG(yeast_g);
 
     document.getElementById('tot-flour').textContent = fmtKg(flourRef_kg);
     document.getElementById('tot-water').textContent = fmtL(totalWater_L);
@@ -969,32 +985,10 @@
     });
 
     // Show/hide sections based on mode
-    document.getElementById('batch1-card').style.display     = isScaldOnly ? 'block' : 'none';
-    document.getElementById('batch2-card').style.display     = isScaldOnly ? 'none'  : 'block';
+
     document.getElementById('totals-card').style.display     = isScaldOnly ? 'none'  : 'block';
     document.getElementById('loaf-table-card').style.display = isScaldOnly ? 'none'  : 'block';
 
-    // Expected loaves for selected liturgy day (bread mode only)
-    const expCard = document.getElementById('expected-loaves-card');
-    const expBody = document.getElementById('expected-loaves-body');
-    if (!isScaldOnly && selectedDays.size === 1) {
-      const d = LITURGY[[...selectedDays][0]];
-      const rows = d.label === 'Sunday Liturgy'
-        ? [
-            { label: '1st Liturgy', value: '12 loaves × 350–400 g' },
-            { label: '2nd Liturgy', value: '28 loaves × 1400–1450 g' },
-            { label: 'Total Minimum', value: '40 loaves' },
-          ]
-        : [
-            { label: d.label, value: `${d.min} loaves × ${d.size}` },
-          ];
-      expBody.innerHTML = rows.map(r =>
-        `<div class="batch-row"><span class="label">${r.label}</span><span class="value">${r.value}</span></div>`
-      ).join('');
-      expCard.style.display = 'block';
-    } else {
-      expCard.style.display = 'none';
-    }
 
     // ── Mixer batch split (max 15 kg dry flour per load) ──
     // Split based on flour actually entering the mixer per mode:
@@ -1032,10 +1026,12 @@
         <div class="batch-row"><span class="label">Boiling Water</span><span class="value">${fmtL(swa)}</span></div>
         <div class="batch-row"><span class="label">Scald Dough Wt.</span><span class="value">${fmtKg(sw)}</span></div>
         ` : `
-        <div class="batch-row"><span class="label">Scald Dough to Add</span><span class="value">${fmtKg(sw)}</span></div>
-        <div class="batch-row"><span class="label">Dry Flour</span><span class="value">${fmtKg(b2f)}</span></div>
-        <div class="batch-row"><span class="label">Cold Water</span><span class="value">${fmtL(b2w)}</span></div>
-        <div class="batch-row"><span class="label">Yeast</span><span class="value">${fmtG(y)}</span></div>
+        <div class="batch-2x2-grid">
+          <div class="batch-2x2-item"><div class="b2-label">Scald Dough</div><div class="b2-val">${fmtKg(sw)}</div></div>
+          <div class="batch-2x2-item"><div class="b2-label">Dry Flour</div><div class="b2-val">${fmtKg(b2f)}</div></div>
+          <div class="batch-2x2-item"><div class="b2-label">Cold Water</div><div class="b2-val">${fmtL(b2w)}</div></div>
+          <div class="batch-2x2-item"><div class="b2-label">Yeast</div><div class="b2-val">${fmtG(y)}</div></div>
+        </div>
         `}
       `;
       batchList.appendChild(div);
