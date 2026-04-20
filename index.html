@@ -234,6 +234,22 @@
       box-shadow: 0 2px 8px rgba(200,130,42,0.3);
     }
 
+    /* ── Override Parameters ── */
+    .override-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .override-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
     /* ── Custom Input ── */
     .custom-input-wrap {
       display: flex;
@@ -657,16 +673,33 @@
     </div>
   </div>
 
-  <!-- Input: By Weight -->
+  <!-- Override Parameters -->
   <div class="card" id="weight-panel">
-    <div class="card-title">Dry Flour Amount</div>
-    <div class="custom-input-wrap" id="custom-wrap">
-      <input type="number" id="custom-kg" placeholder="e.g. 7" min="0.1" step="0.5">
-      <span>kg dry flour</span>
+    <div class="card-title">Override Parameters</div>
+    <div class="override-grid">
+      <div>
+        <div class="override-label">Dry Flour</div>
+        <div class="custom-input-wrap">
+          <input type="number" id="custom-kg" placeholder="e.g. 7" min="0.1" step="0.5">
+          <span>kg</span>
+        </div>
+      </div>
+      <div id="loaf-override-panel" style="display:none;">
+        <div class="override-label">Loaves</div>
+        <div class="custom-input-wrap">
+          <input type="number" id="override-loaves" placeholder="e.g. 40" min="1" step="1">
+          <span>loaves</span>
+        </div>
+      </div>
+      <div id="size-override-panel" style="display:none;">
+        <div class="override-label">Size per Loaf</div>
+        <div class="custom-input-wrap">
+          <input type="number" id="override-size" placeholder="e.g. 500" min="1" step="10">
+          <span>g each</span>
+        </div>
+      </div>
     </div>
   </div>
-
-  <!-- Input: By Loaves -->
 
 
   <!-- Results -->
@@ -838,7 +871,28 @@
     const isScald = state.mode === 'scald';
     document.querySelectorAll('.instr-scald').forEach(el => el.style.display = isScald ? '' : 'none');
     document.querySelectorAll('.instr-bread').forEach(el => el.style.display = isScald ? 'none' : '');
+    document.getElementById('loaf-override-panel').style.display = isScald ? 'none' : 'block';
+    document.getElementById('size-override-panel').style.display = isScald ? 'none' : 'block';
   }
+
+  function loafOverrideToFlour() {
+    const loaves = parseFloat(document.getElementById('override-loaves').value);
+    const sizeG  = parseFloat(document.getElementById('override-size').value);
+    if (loaves > 0 && sizeG > 0) {
+      const flourKg = +((loaves * sizeG / 1000) / 1.65).toFixed(2);
+      document.getElementById('custom-kg').value = flourKg;
+      autoCalculate();
+    }
+  }
+
+  document.getElementById('override-loaves').addEventListener('input', loafOverrideToFlour);
+  document.getElementById('override-size').addEventListener('input', loafOverrideToFlour);
+
+  document.getElementById('custom-kg').addEventListener('input', () => {
+    document.getElementById('override-loaves').value = '';
+    document.getElementById('override-size').value = '';
+    autoCalculate();
+  });
 
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -939,7 +993,6 @@
     });
   });
 
-  document.getElementById('custom-kg').addEventListener('input', autoCalculate);
 
   function autoCalculate() {
     const flourKg = parseFloat(document.getElementById('custom-kg').value);
