@@ -28,7 +28,7 @@
 
     /* ── Dark mode ── */
     @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
+      :root:not([data-theme="light"]):not([data-theme="dark"]) {
         --cream:        #071428;
         --cream-mid:    #0E2040;
         --cream-border: #1A3A6B;
@@ -678,15 +678,47 @@
     <div class="card-title">Override Parameters</div>
     <div class="override-grid">
       <div id="loaf-override-panel" style="display:none;">
-        <div class="override-label">Number of Loaves</div>
-        <div class="custom-input-wrap">
-          <input type="number" id="override-loaves" placeholder="e.g. 40 loaves" min="1" step="1" style="width:100%;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+          <div>
+            <div class="override-label" id="loaf-row1-label">No. of Loaves</div>
+            <div class="custom-input-wrap">
+              <input type="number" id="override-loaves" placeholder="e.g. 40" min="1" step="1" style="width:100%;">
+            </div>
+          </div>
+          <div>
+            <div class="override-label" id="size-row1-label">Size per Loaf (g)</div>
+            <div class="custom-input-wrap">
+              <input type="number" id="override-size" placeholder="e.g. 500" min="1" step="10" style="width:100%;">
+            </div>
+          </div>
         </div>
-      </div>
-      <div id="size-override-panel" style="display:none;">
-        <div class="override-label">Size per Loaf (g)</div>
-        <div class="custom-input-wrap">
-          <input type="number" id="override-size" placeholder="e.g. 500 g" min="1" step="10" style="width:100%;">
+        <div id="loaf-row2" style="display:none;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+          <div>
+            <div class="override-label">2nd Liturgy – Loaves</div>
+            <div class="custom-input-wrap">
+              <input type="number" id="override-loaves2" placeholder="e.g. 28" min="0" step="1" style="width:100%;">
+            </div>
+          </div>
+          <div>
+            <div class="override-label">Size per Loaf (g)</div>
+            <div class="custom-input-wrap">
+              <input type="number" id="override-size2" placeholder="e.g. 1425" min="0" step="10" style="width:100%;">
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+          <div>
+            <div class="override-label">Additional – Loaves</div>
+            <div class="custom-input-wrap">
+              <input type="number" id="override-loaves-extra" placeholder="0" min="0" step="1" value="0" style="width:100%;">
+            </div>
+          </div>
+          <div>
+            <div class="override-label">Size per Loaf (g)</div>
+            <div class="custom-input-wrap">
+              <input type="number" id="override-size-extra" placeholder="0" min="0" step="10" value="0" style="width:100%;">
+            </div>
+          </div>
         </div>
       </div>
       <hr style="border:none;border-top:1px solid var(--cream-border);margin:0.25rem 0;">
@@ -836,8 +868,7 @@
     themeBtn.textContent = dark ? '☀️ Light' : '🌙 Dark';
   }
 
-  applyTheme(prefersDark.matches);
-  prefersDark.addEventListener('change', e => applyTheme(e.matches));
+  applyTheme(false);
   themeBtn.addEventListener('click', () => applyTheme(html.getAttribute('data-theme') !== 'dark'));
 
   // ── Liturgy Data ──
@@ -870,21 +901,35 @@
     document.querySelectorAll('.instr-scald').forEach(el => el.style.display = isScald ? '' : 'none');
     document.querySelectorAll('.instr-bread').forEach(el => el.style.display = isScald ? 'none' : '');
     document.getElementById('loaf-override-panel').style.display = isScald ? 'none' : 'block';
-    document.getElementById('size-override-panel').style.display = isScald ? 'none' : 'block';
   }
 
   function loafOverrideToFlour() {
-    const loaves = parseFloat(document.getElementById('override-loaves').value);
-    const sizeG  = parseFloat(document.getElementById('override-size').value);
-    if (loaves > 0 && sizeG > 0) {
-      const flourKg = +((loaves * sizeG / 1000) / 1.65).toFixed(2);
-      document.getElementById('custom-kg').value = flourKg;
+    const loaves = parseFloat(document.getElementById('override-loaves').value) || 0;
+    const sizeG  = parseFloat(document.getElementById('override-size').value)   || 0;
+    let totalDough = loaves * sizeG / 1000;
+
+    if (document.getElementById('loaf-row2').style.display === 'grid') {
+      const l2 = parseFloat(document.getElementById('override-loaves2').value) || 0;
+      const s2 = parseFloat(document.getElementById('override-size2').value)   || 0;
+      totalDough += l2 * s2 / 1000;
+    }
+
+    const lExtra = parseFloat(document.getElementById('override-loaves-extra').value) || 0;
+    const sExtra = parseFloat(document.getElementById('override-size-extra').value)   || 0;
+    totalDough += lExtra * sExtra / 1000;
+
+    if (totalDough > 0) {
+      document.getElementById('custom-kg').value = +(totalDough / 1.65).toFixed(2);
       autoCalculate();
     }
   }
 
   document.getElementById('override-loaves').addEventListener('input', loafOverrideToFlour);
   document.getElementById('override-size').addEventListener('input', loafOverrideToFlour);
+  document.getElementById('override-loaves2').addEventListener('input', loafOverrideToFlour);
+  document.getElementById('override-size2').addEventListener('input', loafOverrideToFlour);
+  document.getElementById('override-loaves-extra').addEventListener('input', loafOverrideToFlour);
+  document.getElementById('override-size-extra').addEventListener('input', loafOverrideToFlour);
 
   document.getElementById('custom-kg').addEventListener('input', () => {
     document.getElementById('override-loaves').value = '';
@@ -972,12 +1017,29 @@
 
     if (state.mode === 'bread' && rows.length === 1) {
       const d = rows[0];
-      const recSize = d.recSizes && d.recSizes[0]
-        ? Math.round((d.recSizes[0].min + d.recSizes[0].max) / 2)
-        : null;
-      if (d.min) document.getElementById('override-loaves').value = d.min;
-      if (recSize) document.getElementById('override-size').value = recSize;
-      loafOverrideToFlour();
+      const isSunday = d.label === 'Sunday Liturgy';
+      const row2 = document.getElementById('loaf-row2');
+
+      if (isSunday) {
+        document.getElementById('loaf-row1-label').textContent = '1st Liturgy – Loaves';
+        document.getElementById('size-row1-label').textContent = '1st Liturgy – Size (g)';
+        document.getElementById('override-loaves').value = 12;
+        document.getElementById('override-size').value = 375;
+        document.getElementById('override-loaves2').value = 28;
+        document.getElementById('override-size2').value = 1425;
+        row2.style.display = 'grid';
+      } else {
+        document.getElementById('loaf-row1-label').textContent = 'No. of Loaves';
+        document.getElementById('size-row1-label').textContent = 'Size per Loaf (g)';
+        const recSize = d.recSizes && d.recSizes[0]
+          ? Math.round((d.recSizes[0].min + d.recSizes[0].max) / 2) : null;
+        if (d.min) document.getElementById('override-loaves').value = d.min;
+        if (recSize) document.getElementById('override-size').value = recSize;
+        document.getElementById('override-loaves2').value = '';
+        document.getElementById('override-size2').value = '';
+        row2.style.display = 'none';
+      }
+      document.getElementById('custom-kg').value = d.flour;
     } else if (totalFlour > 0) {
       document.getElementById('custom-kg').value = totalFlour;
     }
