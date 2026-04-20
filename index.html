@@ -236,8 +236,8 @@
 
     /* ── Override Parameters ── */
     .override-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 0.75rem;
       margin-top: 0.5rem;
     }
@@ -678,23 +678,21 @@
     <div class="card-title">Override Parameters</div>
     <div class="override-grid">
       <div id="loaf-override-panel" style="display:none;">
-        <div class="override-label">No. of Loaves</div>
+        <div class="override-label">Number of Loaves</div>
         <div class="custom-input-wrap">
-          <input type="number" id="override-loaves" placeholder="e.g. 40" min="1" step="1">
-          <span>loaves</span>
+          <input type="number" id="override-loaves" placeholder="e.g. 40 loaves" min="1" step="1" style="width:100%;">
         </div>
       </div>
       <div id="size-override-panel" style="display:none;">
-        <div class="override-label">Size per Loaf</div>
+        <div class="override-label">Size per Loaf (g)</div>
         <div class="custom-input-wrap">
-          <input type="number" id="override-size" placeholder="e.g. 500" min="1" step="10">
-          <span>g</span>
+          <input type="number" id="override-size" placeholder="e.g. 500 g" min="1" step="10" style="width:100%;">
         </div>
       </div>
       <div>
-        <div class="override-label">Dry Flour</div>
+        <div class="override-label">Dry Flour (kg)</div>
         <div class="custom-input-wrap">
-          <input type="number" id="custom-kg" placeholder="e.g. 7 kg" min="0.1" step="0.5">
+          <input type="number" id="custom-kg" placeholder="e.g. 7 kg" min="0.1" step="0.5" style="width:100%;">
         </div>
       </div>
     </div>
