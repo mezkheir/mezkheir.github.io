@@ -677,15 +677,8 @@
   <div class="card" id="weight-panel">
     <div class="card-title">Override Parameters</div>
     <div class="override-grid">
-      <div>
-        <div class="override-label">Dry Flour</div>
-        <div class="custom-input-wrap">
-          <input type="number" id="custom-kg" placeholder="e.g. 7" min="0.1" step="0.5">
-          <span>kg</span>
-        </div>
-      </div>
       <div id="loaf-override-panel" style="display:none;">
-        <div class="override-label">Loaves</div>
+        <div class="override-label">No. of Loaves</div>
         <div class="custom-input-wrap">
           <input type="number" id="override-loaves" placeholder="e.g. 40" min="1" step="1">
           <span>loaves</span>
@@ -695,7 +688,13 @@
         <div class="override-label">Size per Loaf</div>
         <div class="custom-input-wrap">
           <input type="number" id="override-size" placeholder="e.g. 500" min="1" step="10">
-          <span>g each</span>
+          <span>g</span>
+        </div>
+      </div>
+      <div>
+        <div class="override-label">Dry Flour</div>
+        <div class="custom-input-wrap">
+          <input type="number" id="custom-kg" placeholder="e.g. 7 kg" min="0.1" step="0.5">
         </div>
       </div>
     </div>
