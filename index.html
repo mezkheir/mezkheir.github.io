@@ -689,6 +689,7 @@
           <input type="number" id="override-size" placeholder="e.g. 500 g" min="1" step="10" style="width:100%;">
         </div>
       </div>
+      <hr style="border:none;border-top:1px solid var(--cream-border);margin:0.25rem 0;">
       <div>
         <div class="override-label">Dry Flour (kg)</div>
         <div class="custom-input-wrap">
@@ -968,7 +969,18 @@
     }
 
     box.style.display = 'block';
-    if (totalFlour > 0) document.getElementById('custom-kg').value = totalFlour;
+
+    if (state.mode === 'bread' && rows.length === 1) {
+      const d = rows[0];
+      const recSize = d.recSizes && d.recSizes[0]
+        ? Math.round((d.recSizes[0].min + d.recSizes[0].max) / 2)
+        : null;
+      if (d.min) document.getElementById('override-loaves').value = d.min;
+      if (recSize) document.getElementById('override-size').value = recSize;
+      loafOverrideToFlour();
+    } else if (totalFlour > 0) {
+      document.getElementById('custom-kg').value = totalFlour;
+    }
   }
 
   document.querySelectorAll('.liturgy-btn').forEach(btn => {
