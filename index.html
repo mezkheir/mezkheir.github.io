@@ -704,13 +704,6 @@
       <div class="instr-section-label" style="margin-top:1rem;">Display</div>
       <div class="settings-grid">
         <div class="settings-row">
-          <label>Mode</label>
-          <select id="s-mode" style="padding:0.4rem 0.6rem;border:1px solid var(--cream-border);border-radius:var(--radius-sm);font-size:0.9rem;color:var(--text-dark);background:var(--cream);">
-            <option value="scald">🌡 Scald Dough</option>
-            <option value="bread">Orban Dough</option>
-          </select>
-        </div>
-        <div class="settings-row">
           <label>Font Size</label>
           <select id="s-fontsize" style="padding:0.4rem 0.6rem;border:1px solid var(--cream-border);border-radius:var(--radius-sm);font-size:0.9rem;color:var(--text-dark);background:var(--cream);">
             <option value="1">Normal</option>
@@ -722,10 +715,6 @@
 
       <div class="instr-section-label" style="margin-top:1rem;">Recipe Parameters</div>
       <div class="settings-grid">
-        <div class="settings-row">
-          <label>Dough Multiplier</label>
-          <input type="number" id="s-dough" value="1.65" min="1" max="2" step="0.01">
-        </div>
         <div class="settings-row">
           <label>Yeast (g per kg flour)</label>
           <input type="number" id="s-yeast" value="4" min="0.1" max="20" step="0.1">
@@ -983,7 +972,7 @@
   });
 
   function applySettings() {
-    state.doughMultiplier  = parseFloat(document.getElementById('s-dough').value)  || 1.65;
+
     state.yeastPerKgFlour  = parseFloat(document.getElementById('s-yeast').value)   || 4;
 
     LITURGY.tuesday.flour  = parseFloat(document.getElementById('s-tue-flour').value)  || 3;
@@ -1009,7 +998,7 @@
     autoCalculate();
   }
 
-  ['s-dough','s-yeast',
+  ['s-yeast',
    's-tue-flour','s-tue-loaves','s-tue-size',
    's-thu-flour','s-thu-loaves','s-thu-size',
    's-sat-flour','s-sat-loaves','s-sat-size',
@@ -1101,20 +1090,10 @@
     autoCalculate();
   });
 
-  document.getElementById('s-mode').addEventListener('change', function() {
-    document.querySelectorAll('.mode-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.mode === this.value);
-    });
-    state.mode = this.value;
-    updateInstructions();
-    defaultToNextLiturgy();
-  });
-
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById('s-mode').value = btn.dataset.mode;
       state.mode = btn.dataset.mode;
       updateInstructions();
       defaultToNextLiturgy();
