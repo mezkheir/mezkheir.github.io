@@ -24,6 +24,7 @@
       --radius-sm:    8px;
       --shadow:       0 4px 20px rgba(26,58,107,0.12);
       --shadow-lg:    0 8px 32px rgba(26,58,107,0.20);
+      --font-scale:   1;
     }
 
     /* ── Dark mode ── */
@@ -397,7 +398,7 @@
       padding: 0.6rem 0.75rem;
     }
     .total-item .t-value {
-      font-size: 1rem;
+      font-size: calc(1rem * var(--font-scale));
       font-weight: 700;
       color: var(--white);
       color: var(--amber-light);
@@ -450,7 +451,7 @@
       display: flex;
       gap: 0.75rem;
       align-items: flex-start;
-      font-size: 0.9rem;
+      font-size: calc(0.9rem * var(--font-scale));
       color: var(--text-mid);
       line-height: 1.5;
     }
@@ -624,7 +625,7 @@
       margin-bottom: 0.2rem;
     }
     .b2-val {
-      font-size: 1rem;
+      font-size: calc(1rem * var(--font-scale));
       font-weight: 700;
       color: var(--brown-dark);
     }
@@ -699,6 +700,18 @@
 
   <!-- Settings Panel -->
   <div id="settings-body" style="display:none;">
+
+      <div class="instr-section-label" style="margin-top:1rem;">Display</div>
+      <div class="settings-grid">
+        <div class="settings-row">
+          <label>Font Size</label>
+          <select id="s-fontsize" style="padding:0.4rem 0.6rem;border:1px solid var(--cream-border);border-radius:var(--radius-sm);font-size:0.9rem;color:var(--text-dark);background:var(--cream);">
+            <option value="1">Normal</option>
+            <option value="1.2">Large</option>
+            <option value="1.4">Extra Large</option>
+          </select>
+        </div>
+      </div>
 
       <div class="instr-section-label" style="margin-top:1rem;">Recipe Parameters</div>
       <div class="settings-grid">
@@ -956,6 +969,10 @@
     const body = document.getElementById('settings-body');
     const open = body.style.display === 'none';
     body.style.display = open ? 'block' : 'none';
+  });
+
+  document.getElementById('s-fontsize').addEventListener('change', function() {
+    document.documentElement.style.setProperty('--font-scale', this.value);
   });
 
   function applySettings() {
