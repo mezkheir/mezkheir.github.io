@@ -1030,7 +1030,7 @@
                 recSizes: [{ min: 325, max: 350, label: '325–350 g', count: 18 }] },
     saturday: { label: "Saturday's Liturgy", flour: 7,  size: '600–650 g',   min: 15, note: null,
                 recSizes: [{ min: 600, max: 650, label: '600–650 g', count: 15 }] },
-    sunday:   { label: "Sunday Liturgy",     flour: 30, size: '40 total',     min: 40, note: '1st Liturgy: 12 Orban × 350–400 g · 2nd Liturgy: 28 Orban × 1400–1450 g. Palm Sunday: increase to 1550–1600 g and min 45 kg dry flour.',
+    sunday:   { label: "Sunday Liturgy",     flour: 30, size: '40 total',     min: 40, note: '1st Liturgy: 12 Orban × 350–400 g · 2nd Liturgy: 28 Orban × 1400–1450 g. Palm Sunday: increase to 1550–1600 g and min 65 kg dry flour.',
                 recSizes: [{ min: 350, max: 400, label: '350–400 g (1st)', count: 12 }, { min: 1400, max: 1450, label: '1400–1450 g (2nd)', count: 28 }] },
   };
 
@@ -1152,7 +1152,7 @@
           return batchRow('Dry Flour', `${d.flour} kg`) +
                  batchRow('1st Liturgy', '12 Orban × 350–400 g') +
                  batchRow('2nd Liturgy', '28 Orban × 1400–1450 g') +
-                 `<div style="font-size:0.78rem;color:var(--text-light);margin-top:0.4rem;">Palm Sunday: increase to 1550–1600 g and min 45 kg dry flour.</div>`;
+                 `<div style="font-size:0.78rem;color:var(--text-light);margin-top:0.4rem;">Palm Sunday: increase to 1550–1600 g and min 65 kg dry flour.</div>`;
         }
         let html = batchRow('Dry Flour', `${d.flour} kg`) +
                    batchRow('Expected Orban', `${d.min} Orban × ${d.size}`);
@@ -1257,7 +1257,7 @@
     document.getElementById('tot-dough').textContent = fmtKg(totalDough_kg);
 
     document.getElementById('results-summary').textContent =
-      `${fmtKg(flourRef_kg)} dry flour · 40% scald`;
+      `${fmtKg(flourRef_kg)} dry flour · ${state.yeastPerKgFlour} g yeast/kg · 40% scald`;
 
     // Loaf table
     const recSizes = (!isScaldOnly && selectedDays.size === 1)
