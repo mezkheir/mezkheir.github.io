@@ -1090,9 +1090,7 @@
     const batch2Flour_kg = flourRef_kg - scaldFlour_kg;
     const batch2Water_L  = totalWater_L - scaldWater_L;
 
-    const yeast_g = state.season === 'winter'
-      ? totalDough_kg * 4
-      : totalDough_kg * 3;
+    const yeast_g = flourRef_kg * 4;
 
 
     document.getElementById('tot-yeast').textContent = fmtG(yeast_g);
