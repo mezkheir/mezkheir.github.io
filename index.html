@@ -1371,6 +1371,23 @@
     const resultsEl = document.getElementById('results');
     resultsEl.classList.add('visible');
   }
+
+  // Auto-select liturgy based on current day (prep day → next liturgy)
+  (function defaultToNextLiturgy() {
+    // Key: JS day (0=Sun … 6=Sat), Value: liturgy to prepare for
+    const prepMap = {
+      0: 'sunday',    // Sunday   → Sunday
+      1: 'tuesday',   // Monday   → Tuesday
+      2: 'tuesday',   // Tuesday  → Tuesday
+      3: 'thursday',  // Wednesday→ Thursday
+      4: 'thursday',  // Thursday → Thursday
+      5: 'saturday',  // Friday   → Saturday
+      6: 'sunday',    // Saturday → Sunday
+    };
+    const key = prepMap[new Date().getDay()];
+    const btn = document.querySelector(`.liturgy-btn[data-liturgy="${key}"]`);
+    if (btn) btn.click();
+  })();
 </script>
 
 </body>
