@@ -651,9 +651,43 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       font-style: italic;
     }
     footer strong { color: var(--amber-light); font-style: normal; }
+    /* ── Pull to refresh ── */
+    #ptr-indicator {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 0;
+      overflow: hidden;
+      background: transparent;
+      z-index: 1000;
+      transition: height 0.15s ease;
+      pointer-events: none;
+    }
+    #ptr-indicator.pulling { height: 60px; }
+    #ptr-indicator.releasing { height: 60px; }
+    #ptr-indicator.refreshing { height: 60px; }
+    .ptr-spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(91,157,232,0.3);
+      border-top-color: var(--amber-light);
+      border-radius: 50%;
+      transition: transform 0.1s linear, opacity 0.15s;
+      opacity: 0;
+    }
+    #ptr-indicator.pulling .ptr-spinner  { opacity: 1; }
+    #ptr-indicator.releasing .ptr-spinner { opacity: 1; }
+    #ptr-indicator.refreshing .ptr-spinner {
+      opacity: 1;
+      animation: ptr-spin 0.6s linear infinite;
+    }
+    @keyframes ptr-spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+<div id="ptr-indicator"><div class="ptr-spinner"></div></div>
 
 <header>
   <button class="settings-btn" id="settings-toggle" aria-label="Settings">⚙</button>
@@ -1344,5 +1378,50 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     navigator.serviceWorker.register('sw.js');
   }
 </script>
+
+<script>
+  // ── Pull to refresh ──
+  (function () {
+    const THRESHOLD = 80;
+    let startY = 0, currentY = 0, pulling = false;
+    const el = document.getElementById('ptr-indicator');
+    const spinner = el.querySelector('.ptr-spinner');
+
+    document.addEventListener('touchstart', e => {
+      if (window.scrollY === 0) {
+        startY = e.touches[0].clientY;
+        pulling = true;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', e => {
+      if (!pulling) return;
+      currentY = e.touches[0].clientY;
+      const dy = Math.max(0, currentY - startY);
+      if (dy > 8) {
+        el.classList.add('pulling');
+        el.classList.remove('releasing');
+        // Rotate spinner proportionally to pull distance
+        spinner.style.transform = `rotate(${dy * 2}deg)`;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      if (!pulling) return;
+      pulling = false;
+      const dy = Math.max(0, currentY - startY);
+      if (dy >= THRESHOLD) {
+        el.classList.remove('pulling');
+        el.classList.add('refreshing');
+        spinner.style.transform = '';
+        setTimeout(() => location.reload(), 300);
+      } else {
+        el.classList.remove('pulling', 'releasing', 'refreshing');
+      }
+      startY = 0; currentY = 0;
+    });
+  })();
+</script>
+
 </body>
 </html>
