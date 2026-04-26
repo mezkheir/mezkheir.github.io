@@ -1456,6 +1456,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       btn.classList.add('active');
       document.getElementById('tab-' + tab).classList.add('active');
       updateHomeIcon();
+      if (tab === 'home') autoCalculate();
     });
   });
   updateHomeIcon(); // set initial state
