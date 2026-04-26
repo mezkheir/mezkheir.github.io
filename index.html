@@ -20,6 +20,7 @@
       --brown-mid:    #2558A8;
       --amber:        #2558A8;
       --amber-light:  #5B9DE8;
+      --cream-light:  #EDF3FB;
       --cream:        #F4F7FB;
       --cream-mid:    #E3ECF7;
       --cream-border: #BDD0EA;
@@ -2126,35 +2127,84 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
 <script>
   // ══════════════════════════════════════════════════════
-  // ── Checklist Mode ──
+  // ── Checklist Mode (JS-driven, no CSS-var dependency) ──
   // ══════════════════════════════════════════════════════
   let checklistMode = false;
-  const TOTAL_STEPS = 24;
 
   function toggleChecklistMode() {
     checklistMode = !checklistMode;
     const card = document.getElementById('instr-card');
+    const btn  = card.querySelector('.checklist-toggle-btn');
+    const steps = card.querySelectorAll('li[data-step]');
+
     card.classList.toggle('checklist-mode', checklistMode);
+
+    // Direct style for guaranteed feedback regardless of CSS variable resolution
+    if (checklistMode) {
+      btn.style.cssText = 'background:#2558A8;border-color:#2558A8;color:#fff;display:flex;align-items:center;gap:0.3rem;border-radius:16px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;cursor:pointer;border:1.5px solid #2558A8;white-space:nowrap;';
+      steps.forEach(li => { li.style.cursor = 'pointer'; });
+    } else {
+      btn.style.cssText = 'background:#EDF3FB;border-color:#BDD0EA;color:#2558A8;display:flex;align-items:center;gap:0.3rem;border-radius:16px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;cursor:pointer;border:1.5px solid #BDD0EA;white-space:nowrap;';
+      steps.forEach(li => { li.style.cursor = ''; });
+    }
     updateChecklistProgress();
   }
 
   function checkStep(li) {
     if (!checklistMode) return;
     li.classList.toggle('done');
+    const isDone   = li.classList.contains('done');
+    const stepNum  = li.querySelector('.step-num');
+    const stepBody = li.querySelector('.step-body');
+    const span     = li.querySelector('.step-body > span');
+
+    if (isDone) {
+      if (stepNum)  { stepNum.style.background = '#2e7d4f'; stepNum.style.color = '#fff'; }
+      if (stepBody)   stepBody.style.opacity = '0.45';
+      if (span)       span.style.textDecoration = 'line-through';
+    } else {
+      if (stepNum)  { stepNum.style.background = ''; stepNum.style.color = ''; }
+      if (stepBody)   stepBody.style.opacity = '';
+      if (span)       span.style.textDecoration = '';
+    }
     updateChecklistProgress();
   }
 
   function updateChecklistProgress() {
-    const done = document.querySelectorAll('#instr-card li.done').length;
+    const done  = document.querySelectorAll('#instr-card li.done').length;
     const total = document.querySelectorAll('#instr-card li[data-step]').length;
-    const el = document.getElementById('checklist-progress');
+    const el    = document.getElementById('checklist-progress');
+    if (!el) return;
     el.textContent = done + '/' + total;
+    el.style.display = checklistMode ? 'inline' : 'none';
+    const resetBtn = document.getElementById('checklist-reset');
+    if (resetBtn) resetBtn.style.display = checklistMode ? 'inline' : 'none';
   }
 
   function resetChecklist() {
-    document.querySelectorAll('#instr-card li.done').forEach(li => li.classList.remove('done'));
+    document.querySelectorAll('#instr-card li.done').forEach(li => {
+      li.classList.remove('done');
+      const stepNum  = li.querySelector('.step-num');
+      const stepBody = li.querySelector('.step-body');
+      const span     = li.querySelector('.step-body > span');
+      if (stepNum)  { stepNum.style.background = ''; stepNum.style.color = ''; }
+      if (stepBody)   stepBody.style.opacity = '';
+      if (span)       span.style.textDecoration = '';
+    });
     updateChecklistProgress();
   }
+
+  // Initialise button style on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const card = document.getElementById('instr-card');
+    if (!card) return;
+    const btn = card.querySelector('.checklist-toggle-btn');
+    if (btn) btn.style.cssText = 'background:#EDF3FB;border:1.5px solid #BDD0EA;color:#2558A8;display:flex;align-items:center;gap:0.3rem;border-radius:16px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;';
+    const resetBtn = document.getElementById('checklist-reset');
+    if (resetBtn) resetBtn.style.display = 'none';
+    const progress = document.getElementById('checklist-progress');
+    if (progress) progress.style.display = 'none';
+  });
 
   // ══════════════════════════════════════════════════════
   // ── Timer Engine ──
@@ -2163,17 +2213,15 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   let timerIntervalId = null;
 
   function startTimer(name, seconds, btnEl) {
-    // Cancel existing same-name timer
     if (activeTimers[name]) _cancelTimer(name);
     const endTime = Date.now() + seconds * 1000;
     activeTimers[name] = { endTime, btnEl, name };
-    if (btnEl) { btnEl.classList.add('running'); btnEl._timerName = name; }
+    if (btnEl) { btnEl.style.background = '#2558A8'; btnEl.style.color = '#fff'; btnEl._timerName = name; }
     _ensureInterval();
     renderTimerBar();
   }
 
   function startProoferTimer(mins, btnEl) {
-    // Proofer + auto-schedule oven preheat reminder at 30 min before end
     startTimer('Proofer', mins * 60, btnEl);
     const ovenDelay = Math.max(0, (mins - 30) * 60 * 1000);
     const ovenId = setTimeout(() => {
@@ -2185,11 +2233,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   function startBakingTimer(btnEl) {
     startTimer('Baking', 22 * 60, btnEl);
-    // Schedule re-poke alert at 5 minutes
     const repoke = setTimeout(() => {
       showToast('✋ Re-poke holes now! (5 min mark)');
       if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
-      _beep(1047, 3); // higher pitch for re-poke
+      _beep(1047, 3);
     }, 5 * 60 * 1000);
     activeTimers['Baking']._repokeId = repoke;
   }
@@ -2197,7 +2244,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   function _cancelTimer(name) {
     const t = activeTimers[name];
     if (!t) return;
-    if (t.btnEl) t.btnEl.classList.remove('running');
+    if (t.btnEl) { t.btnEl.style.background = ''; t.btnEl.style.color = ''; }
     if (t._ovenAlertId) clearTimeout(t._ovenAlertId);
     if (t._repokeId) clearTimeout(t._repokeId);
     delete activeTimers[name];
@@ -2209,9 +2256,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   }
 
   function _ensureInterval() {
-    if (!timerIntervalId) {
-      timerIntervalId = setInterval(_tickTimers, 500);
-    }
+    if (!timerIntervalId) timerIntervalId = setInterval(_tickTimers, 500);
   }
 
   function _tickTimers() {
@@ -2219,21 +2264,15 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     let anyActive = false;
     for (const name in activeTimers) {
       const t = activeTimers[name];
-      if (now >= t.endTime) {
-        _timerDone(name, t);
-      } else {
-        anyActive = true;
-      }
+      if (now >= t.endTime) { _timerDone(name, t); }
+      else anyActive = true;
     }
-    if (!anyActive && timerIntervalId) {
-      clearInterval(timerIntervalId);
-      timerIntervalId = null;
-    }
+    if (!anyActive && timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; }
     renderTimerBar();
   }
 
   function _timerDone(name, t) {
-    if (t.btnEl) t.btnEl.classList.remove('running');
+    if (t.btnEl) { t.btnEl.style.background = ''; t.btnEl.style.color = ''; }
     delete activeTimers[name];
     showToast('⏰ ' + name + ' — done!');
     _beep(880, 3);
@@ -2244,8 +2283,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       for (let i = 0; i < count; i++) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
         osc.frequency.value = freq;
         const t = ctx.currentTime + i * 0.35;
@@ -2261,31 +2299,32 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   let _toastTimeout = null;
   function showToast(msg) {
     const el = document.getElementById('timer-toast');
+    if (!el) return;
     el.textContent = msg;
-    el.classList.add('show');
+    el.style.cssText = 'display:block;position:fixed;top:1rem;left:50%;transform:translateX(-50%) scale(1);z-index:210;background:#1A3A6B;color:#fff;border-radius:14px;padding:0.75rem 1.4rem;font-size:0.9rem;font-weight:700;box-shadow:0 6px 28px rgba(0,0,0,0.4);text-align:center;opacity:1;';
     if (_toastTimeout) clearTimeout(_toastTimeout);
-    _toastTimeout = setTimeout(() => el.classList.remove('show'), 4500);
+    _toastTimeout = setTimeout(() => { el.style.display = 'none'; }, 4500);
   }
 
   function renderTimerBar() {
     const bar = document.getElementById('timer-bar');
+    if (!bar) return;
     const names = Object.keys(activeTimers);
     if (!names.length) { bar.style.display = 'none'; return; }
-    bar.style.display = 'flex';
-    const chips = names.map(name => {
+    bar.style.cssText = 'display:flex;position:fixed;bottom:62px;left:0;right:0;z-index:90;padding:0.45rem 0.75rem;background:rgba(26,58,107,0.96);flex-wrap:wrap;gap:0.4rem;align-items:center;box-shadow:0 -2px 16px rgba(0,0,0,0.28);';
+    bar.innerHTML = names.map(name => {
       const remaining = Math.max(0, activeTimers[name].endTime - Date.now());
       const mins = Math.floor(remaining / 60000);
       const secs = Math.floor((remaining % 60000) / 1000);
-      const expiring = remaining < 60000;
-      const safeId = name.replace(/[^a-zA-Z0-9]/g,'_');
-      return '<div class="timer-chip' + (expiring ? ' expiring' : '') +
-        '" onclick="clearTimerByName('' + name.replace(/'/g,"\'") + '')" title="Tap to cancel">' +
-        '<span class="tc-name">' + name + '</span>' +
-        '<span class="tc-time">' + mins + ':' + String(secs).padStart(2,'0') + '</span>' +
-        '<span class="tc-x">✕</span></div>';
+      const exp  = remaining < 60000;
+      const bg   = exp ? 'rgba(210,50,50,0.55)' : 'rgba(255,255,255,0.13)';
+      return '<div style="display:flex;align-items:center;gap:0.35rem;background:' + bg + ';border-radius:20px;padding:0.3rem 0.6rem 0.3rem 0.75rem;cursor:pointer;" onclick="clearTimerByName('' + name.replace(/'/g, "\'") + '')" title="Tap to cancel">' +
+        '<span style="font-size:0.74rem;font-weight:600;color:rgba(255,255,255,0.85);">' + name + '</span>' +
+        '<span style="font-size:0.82rem;font-weight:700;color:#ffd08a;font-variant-numeric:tabular-nums;min-width:2.6rem;">&nbsp;' + mins + ':' + String(secs).padStart(2,'0') + '</span>' +
+        '<span style="font-size:0.68rem;color:rgba(255,255,255,0.45);margin-left:0.1rem;">✕</span></div>';
     }).join('');
-    bar.innerHTML = chips;
   }
+
 </script>
 
 <script>
