@@ -778,6 +778,65 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       margin: 0.85rem 0 0.35rem;
     }
     .faq-a h4:first-child { margin-top: 0.6rem; }
+
+    /* ── Bake color scale ── */
+    .color-scale {
+      display: flex;
+      gap: 0.35rem;
+      margin: 0.85rem 0 0.5rem;
+      align-items: stretch;
+    }
+    .color-swatch {
+      flex: 1;
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.25rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      border: 2px solid transparent;
+      transition: transform 0.15s;
+    }
+    .color-swatch.ideal {
+      border-color: #2D6645;
+      transform: scale(1.08);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    }
+    .swatch-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.12);
+    }
+    .swatch-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-align: center;
+      line-height: 1.2;
+      color: var(--text-dark);
+    }
+    .swatch-check {
+      font-size: 0.85rem;
+      line-height: 1;
+    }
+    .bake-note {
+      font-size: 0.8rem;
+      background: #F0F7F4;
+      border: 1px solid #B8DFC9;
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.85rem;
+      color: #2D6645;
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+    [data-theme="dark"] .bake-note {
+      background: #0E2A1E;
+      border-color: #1A4A30;
+      color: #6DC99A;
+    }
+    [data-theme="dark"] .swatch-label { color: var(--text-dark); }
   </style>
 </head>
 <body>
@@ -1088,6 +1147,61 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         <li>Start Friday night prep early enough so Orban are fully cooled and packed before midnight.</li>
         <li>Saturday night batches should be baked and packed by 11 PM to ensure freshness for Sunday morning.</li>
         <li>Always report flour and yeast inventory to the Orban leaders group after each bake.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Baking color & time -->
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      🎨 Baking Time &amp; Ideal Color
+      <span class="faq-chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      <h4>Baking Time</h4>
+      <ul>
+        <li>Bake at <strong>365°F</strong> for a total of <strong>22 minutes</strong>.</li>
+        <li>After <strong>5 minutes</strong>, remove and re-poke all holes, then return to finish.</li>
+        <li>Large Orban (&gt;1000 g) may need 1–2 extra minutes — check color, not just time.</li>
+      </ul>
+
+      <h4>Color Scale</h4>
+      <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:0.25rem;">Tap a swatch to see its description. Aim for the middle.</p>
+
+      <div class="color-scale">
+        <div class="color-swatch">
+          <div class="swatch-dot" style="background:#F5EDDA;"></div>
+          <span class="swatch-label">Raw</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-dot" style="background:#EDD99A;"></div>
+          <span class="swatch-label">Under­done</span>
+        </div>
+        <div class="color-swatch ideal">
+          <div class="swatch-dot" style="background:#C8953C;"></div>
+          <span class="swatch-label">Ideal ✓</span>
+          <span class="swatch-check">★</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-dot" style="background:#9B6120;"></div>
+          <span class="swatch-label">Over­done</span>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-dot" style="background:#4A2400;"></div>
+          <span class="swatch-label">Burnt</span>
+        </div>
+      </div>
+
+      <div class="bake-note">
+        ✅ <strong>Ideal:</strong> Lightly golden — smooth, even colour across the top. The Orban should be fully baked and soft, <em>not</em> crispy or hard on the bottom. The stamp pattern should remain visible and defined.
+      </div>
+
+      <h4>What to Watch For</h4>
+      <ul>
+        <li><strong>Raw / Underdone:</strong> Pale cream colour, doughy texture, stamp pattern looks puffy and undefined. Return to oven and check every 2 minutes.</li>
+        <li><strong>Ideal:</strong> Light even golden colour, firm but soft to touch, stamp pattern clear and set.</li>
+        <li><strong>Overdone:</strong> Deeper brown, harder crust, slightly dry. Still usable but not preferred.</li>
+        <li><strong>Burnt:</strong> Dark brown or black patches, hard crust, bitter smell. Not suitable for liturgy.</li>
       </ul>
     </div>
   </div>
