@@ -1058,57 +1058,104 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     </div>
 
   <!-- Instructions -->
-  <div class="card">
-    <div class="card-title">Step-by-Step Instructions</div>
+  <div class="card" id="instr-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;flex-wrap:wrap;gap:0.4rem;">
+      <div class="card-title" style="margin:0;">Step-by-Step Instructions</div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span id="checklist-progress" class="checklist-badge"></span>
+        <button id="checklist-reset" onclick="resetChecklist()" style="background:none;border:none;color:var(--text-light);font-size:0.75rem;cursor:pointer;padding:0.2rem 0.4rem;">↺ Reset</button>
+        <button class="checklist-toggle-btn" onclick="toggleChecklistMode()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Checklist
+        </button>
+      </div>
+    </div>
 
     <div class="instr-section-label instr-bread">Preparation</div>
     <ul class="instructions-list instr-bread">
-      <li><div class="step-num">P</div><span>Turn on <strong>Proofer</strong> — set humidity to <strong>level 9</strong> and temperature to <strong>110°F</strong>.</span></li>
-      <li><div class="step-num">P</div><span>Prepare tray(s), table, tools, and all necessary equipment.</span></li>
+      <li data-step="0" onclick="checkStep(this)"><div class="step-num">P</div><div class="step-body"><span>Turn on <strong>Proofer</strong> — set humidity to <strong>level 9</strong> and temperature to <strong>110°F</strong>.</span></div></li>
+      <li data-step="1" onclick="checkStep(this)"><div class="step-num">P</div><div class="step-body"><span>Prepare tray(s), table, tools, and all necessary equipment.</span></div></li>
     </ul>
 
     <div class="instr-section-label instr-scald">Scalding Dough (Batch 1)</div>
     <ul class="instructions-list instr-scald">
-      <li><div class="step-num">1</div><span>Determine batch size — see the liturgy day selector above for reference amounts.</span></li>
-      <li><div class="step-num">2</div><span>Prepare the <strong>Scald</strong> using the scald ratio amounts shown in the calculator (default 40% — adjustable in Settings).</span></li>
-      <li><div class="step-num">3</div><span>Use <strong>boiling water</strong> for the scald. Mix for at least <strong>15–20 minutes</strong>.</span></li>
-      <li><div class="step-num">4</div><span>Cool the scald — it must be <strong>fully and thoroughly cooled</strong> before continuing. Do not rush this step; incomplete cooling will ruin the batch.<br><em>Tip: point a fan at the mixer bowl and periodically run the mixer to move the dough and ensure even cooling.</em></span></li>
+      <li data-step="2" onclick="checkStep(this)"><div class="step-num">1</div><div class="step-body"><span>Determine batch size — see the liturgy day selector above for reference amounts.</span></div></li>
+      <li data-step="3" onclick="checkStep(this)"><div class="step-num">2</div><div class="step-body"><span>Prepare the <strong>Scald</strong> using the scald ratio amounts shown in the calculator (default 40% — adjustable in Settings).</span></div></li>
+      <li data-step="4" onclick="checkStep(this)"><div class="step-num">3</div><div class="step-body">
+        <span>Use <strong>boiling water</strong> for the scald. Mix for at least <strong>15–20 minutes</strong>.</span>
+        <div class="timer-btns">
+          <button class="timer-btn" onclick="startTimer('Scald Mix',900,this);event.stopPropagation()">▶ 15 min</button>
+          <button class="timer-btn" onclick="startTimer('Scald Mix',1200,this);event.stopPropagation()">▶ 20 min</button>
+        </div>
+      </div></li>
+      <li data-step="5" onclick="checkStep(this)"><div class="step-num">4</div><div class="step-body"><span>Cool the scald — it must be <strong>fully and thoroughly cooled</strong> before continuing. Do not rush this step; incomplete cooling will ruin the batch.<br><em>Tip: point a fan at the mixer bowl and periodically run the mixer to move the dough and ensure even cooling.</em></span></div></li>
     </ul>
 
     <div class="instr-section-label instr-bread">Orban Dough (Batch 2)</div>
     <ul class="instructions-list instr-bread">
-      <li><div class="step-num">1</div><span>Add the remaining <strong>flour, cold water, and yeast</strong> (per the calculator amounts) to the fully cooled scald.</span></li>
-      <li><div class="step-num">2</div><span>Mix the combined dough for <strong>10–12 minutes</strong>.</span></li>
-      <li><div class="step-num">3</div><span>Check dough softness — it should be smooth and soft. If needed, add a small amount of water and re-mix for <strong>3 more minutes</strong>.</span></li>
+      <li data-step="6" onclick="checkStep(this)"><div class="step-num">1</div><div class="step-body"><span>Add the remaining <strong>flour, cold water, and yeast</strong> (per the calculator amounts) to the fully cooled scald.</span></div></li>
+      <li data-step="7" onclick="checkStep(this)"><div class="step-num">2</div><div class="step-body">
+        <span>Mix the combined dough for <strong>10–12 minutes</strong>.</span>
+        <div class="timer-btns">
+          <button class="timer-btn" onclick="startTimer('Orban Mix',600,this);event.stopPropagation()">▶ 10 min</button>
+          <button class="timer-btn" onclick="startTimer('Orban Mix',720,this);event.stopPropagation()">▶ 12 min</button>
+        </div>
+      </div></li>
+      <li data-step="8" onclick="checkStep(this)"><div class="step-num">3</div><div class="step-body">
+        <span>Check dough softness — it should be smooth and soft. If needed, add a small amount of water and re-mix for <strong>3 more minutes</strong>.</span>
+        <div class="timer-btns">
+          <button class="timer-btn" onclick="startTimer('Re-mix',180,this);event.stopPropagation()">▶ 3 min</button>
+        </div>
+      </div></li>
     </ul>
 
-    <div class="instr-section-label instr-bread">Shaping & Proofing</div>
+    <div class="instr-section-label instr-bread">Shaping &amp; Proofing</div>
     <ul class="instructions-list instr-bread">
-      <li><div class="step-num">4</div><span>Remove dough and portion to the desired Orban size.</span></li>
-      <li><div class="step-num">5</div><span>Shape, stamp, and place each Orban in the baking tray(s).</span></li>
-      <li><div class="step-num">6</div><span>Once all Orban are in trays, place in the proofer:<br>
-        &nbsp;• <strong>55–60 min</strong> for Orban larger than 1000 g<br>
-        &nbsp;• <strong>35–45 min</strong> for smaller Orban</span></li>
-      <li><div class="step-num">7</div><span><strong>30 minutes</strong> after placing in the proofer, turn on oven(s) and preheat to <strong>365°F</strong>.</span></li>
-      <li><div class="step-num">8</div><span>Check proofing progress and add time if needed.</span></li>
+      <li data-step="9" onclick="checkStep(this)"><div class="step-num">4</div><div class="step-body"><span>Remove dough and portion to the desired Orban size.</span></div></li>
+      <li data-step="10" onclick="checkStep(this)"><div class="step-num">5</div><div class="step-body"><span>Shape, stamp, and place each Orban in the baking tray(s).</span></div></li>
+      <li data-step="11" onclick="checkStep(this)"><div class="step-num">6</div><div class="step-body">
+        <span>Once all Orban are in trays, place in the proofer:<br>
+          &nbsp;• <strong>55–60 min</strong> for Orban larger than 1000 g<br>
+          &nbsp;• <strong>35–45 min</strong> for smaller Orban</span>
+        <div class="timer-btns">
+          <span style="font-size:0.7rem;font-weight:600;color:var(--text-light);align-self:center;">Small:</span>
+          <button class="timer-btn" onclick="startProoferTimer(35,this);event.stopPropagation()">▶ 35 min</button>
+          <button class="timer-btn" onclick="startProoferTimer(45,this);event.stopPropagation()">▶ 45 min</button>
+          <span style="font-size:0.7rem;font-weight:600;color:var(--text-light);align-self:center;">Large:</span>
+          <button class="timer-btn" onclick="startProoferTimer(55,this);event.stopPropagation()">▶ 55 min</button>
+          <button class="timer-btn" onclick="startProoferTimer(60,this);event.stopPropagation()">▶ 60 min</button>
+        </div>
+      </div></li>
+      <li data-step="12" onclick="checkStep(this)"><div class="step-num">7</div><div class="step-body">
+        <span><strong>30 minutes</strong> after placing in the proofer, turn on oven(s) and preheat to <strong>365°F</strong>.</span>
+        <div class="timer-btns">
+          <button class="timer-btn" onclick="startTimer('Oven Preheat',1800,this);event.stopPropagation()">▶ 30 min</button>
+        </div>
+      </div></li>
+      <li data-step="13" onclick="checkStep(this)"><div class="step-num">8</div><div class="step-body"><span>Check proofing progress and add time if needed.</span></div></li>
     </ul>
 
     <div class="instr-section-label instr-bread">Baking</div>
     <ul class="instructions-list instr-bread">
-      <li><div class="step-num">9</div><span>When ready, remove from proofer and <strong>poke 5 holes</strong> in each Orban.</span></li>
-      <li><div class="step-num">10</div><span>Place Orban in the oven and set timer for <strong>22 minutes</strong>.</span></li>
-      <li><div class="step-num">11</div><span>After <strong>5 minutes</strong> in the oven, remove Orban and <strong>re-poke the holes</strong>, then return to finish baking.</span></li>
-      <li><div class="step-num">12</div><span>Bake until the full 22 minutes is complete. Target color: <strong>lightly golden</strong>, fully baked, not crispy.</span></li>
+      <li data-step="14" onclick="checkStep(this)"><div class="step-num">9</div><div class="step-body"><span>When ready, remove from proofer and <strong>poke 5 holes</strong> in each Orban.</span></div></li>
+      <li data-step="15" onclick="checkStep(this)"><div class="step-num">10</div><div class="step-body">
+        <span>Place Orban in the oven and set timer for <strong>22 minutes</strong>.</span>
+        <div class="timer-btns">
+          <button class="timer-btn" onclick="startBakingTimer(this);event.stopPropagation()">▶ 22 min (+ re-poke alert)</button>
+        </div>
+      </div></li>
+      <li data-step="16" onclick="checkStep(this)"><div class="step-num">11</div><div class="step-body"><span>After <strong>5 minutes</strong> in the oven, remove Orban and <strong>re-poke the holes</strong>, then return to finish baking.</span></div></li>
+      <li data-step="17" onclick="checkStep(this)"><div class="step-num">12</div><div class="step-body"><span>Bake until the full 22 minutes is complete. Target color: <strong>lightly golden</strong>, fully baked, not crispy.</span></div></li>
     </ul>
 
     <div class="instr-section-label instr-bread">Finishing</div>
     <ul class="instructions-list instr-bread">
-      <li><div class="step-num">13</div><span>Set Orban to cool. Handle <em>Hamal Orban</em> with extra care and place at the front.</span></li>
-      <li><div class="step-num">14</div><span>Cover Orban with a clean cloth to retain moisture.</span></li>
-      <li><div class="step-num">15</div><span>Clean the Orban room — equipment, tools, and floor. Return stamps, rollers, and all items to designated storage.</span></li>
-      <li><div class="step-num">16</div><span>Ensure all equipment (ovens, proofers) are <strong>off</strong>, and lock the Orban room.</span></li>
-      <li><div class="step-num">17</div><span>Report flour and yeast inventory to the Orban leaders group.</span></li>
-      <li><div class="step-num">18</div><span>🙏 God bless your service and reward everyone with heavenly blessings.</span></li>
+      <li data-step="18" onclick="checkStep(this)"><div class="step-num">13</div><div class="step-body"><span>Set Orban to cool. Handle <em>Hamal Orban</em> with extra care and place at the front.</span></div></li>
+      <li data-step="19" onclick="checkStep(this)"><div class="step-num">14</div><div class="step-body"><span>Cover Orban with a clean cloth to retain moisture.</span></div></li>
+      <li data-step="20" onclick="checkStep(this)"><div class="step-num">15</div><div class="step-body"><span>Clean the Orban room — equipment, tools, and floor. Return stamps, rollers, and all items to designated storage.</span></div></li>
+      <li data-step="21" onclick="checkStep(this)"><div class="step-num">16</div><div class="step-body"><span>Ensure all equipment (ovens, proofers) are <strong>off</strong>, and lock the Orban room.</span></div></li>
+      <li data-step="22" onclick="checkStep(this)"><div class="step-num">17</div><div class="step-body"><span>Report flour and yeast inventory to the Orban leaders group.</span></div></li>
+      <li data-step="23" onclick="checkStep(this)"><div class="step-num">18</div><div class="step-body"><span>🙏 God bless your service and reward everyone with heavenly blessings.</span></div></li>
     </ul>
   </div>
 
@@ -2014,6 +2061,170 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
 
 <script>
+  // ══════════════════════════════════════════════════════
+  // ── Checklist Mode ──
+  // ══════════════════════════════════════════════════════
+  let checklistMode = false;
+  const TOTAL_STEPS = 24;
+
+  function toggleChecklistMode() {
+    checklistMode = !checklistMode;
+    const card = document.getElementById('instr-card');
+    card.classList.toggle('checklist-mode', checklistMode);
+    updateChecklistProgress();
+  }
+
+  function checkStep(li) {
+    if (!checklistMode) return;
+    li.classList.toggle('done');
+    updateChecklistProgress();
+  }
+
+  function updateChecklistProgress() {
+    const done = document.querySelectorAll('#instr-card li.done').length;
+    const total = document.querySelectorAll('#instr-card li[data-step]').length;
+    const el = document.getElementById('checklist-progress');
+    el.textContent = done + '/' + total;
+  }
+
+  function resetChecklist() {
+    document.querySelectorAll('#instr-card li.done').forEach(li => li.classList.remove('done'));
+    updateChecklistProgress();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── Timer Engine ──
+  // ══════════════════════════════════════════════════════
+  const activeTimers = {};
+  let timerIntervalId = null;
+
+  function startTimer(name, seconds, btnEl) {
+    // Cancel existing same-name timer
+    if (activeTimers[name]) _cancelTimer(name);
+    const endTime = Date.now() + seconds * 1000;
+    activeTimers[name] = { endTime, btnEl, name };
+    if (btnEl) { btnEl.classList.add('running'); btnEl._timerName = name; }
+    _ensureInterval();
+    renderTimerBar();
+  }
+
+  function startProoferTimer(mins, btnEl) {
+    // Proofer + auto-schedule oven preheat reminder at 30 min before end
+    startTimer('Proofer', mins * 60, btnEl);
+    const ovenDelay = Math.max(0, (mins - 30) * 60 * 1000);
+    const ovenId = setTimeout(() => {
+      showToast('🔥 Turn on oven — preheat to 365°F');
+      if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
+    }, ovenDelay);
+    activeTimers['Proofer']._ovenAlertId = ovenId;
+  }
+
+  function startBakingTimer(btnEl) {
+    startTimer('Baking', 22 * 60, btnEl);
+    // Schedule re-poke alert at 5 minutes
+    const repoke = setTimeout(() => {
+      showToast('✋ Re-poke holes now! (5 min mark)');
+      if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+      _beep(1047, 3); // higher pitch for re-poke
+    }, 5 * 60 * 1000);
+    activeTimers['Baking']._repokeId = repoke;
+  }
+
+  function _cancelTimer(name) {
+    const t = activeTimers[name];
+    if (!t) return;
+    if (t.btnEl) t.btnEl.classList.remove('running');
+    if (t._ovenAlertId) clearTimeout(t._ovenAlertId);
+    if (t._repokeId) clearTimeout(t._repokeId);
+    delete activeTimers[name];
+  }
+
+  function clearTimerByName(name) {
+    _cancelTimer(name);
+    renderTimerBar();
+  }
+
+  function _ensureInterval() {
+    if (!timerIntervalId) {
+      timerIntervalId = setInterval(_tickTimers, 500);
+    }
+  }
+
+  function _tickTimers() {
+    const now = Date.now();
+    let anyActive = false;
+    for (const name in activeTimers) {
+      const t = activeTimers[name];
+      if (now >= t.endTime) {
+        _timerDone(name, t);
+      } else {
+        anyActive = true;
+      }
+    }
+    if (!anyActive && timerIntervalId) {
+      clearInterval(timerIntervalId);
+      timerIntervalId = null;
+    }
+    renderTimerBar();
+  }
+
+  function _timerDone(name, t) {
+    if (t.btnEl) t.btnEl.classList.remove('running');
+    delete activeTimers[name];
+    showToast('⏰ ' + name + ' — done!');
+    _beep(880, 3);
+    if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 400]);
+  }
+
+  function _beep(freq, count) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      for (let i = 0; i < count; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        const t = ctx.currentTime + i * 0.35;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.25, t + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        osc.start(t); osc.stop(t + 0.3);
+      }
+      setTimeout(() => ctx.close(), 2000);
+    } catch(e) {}
+  }
+
+  let _toastTimeout = null;
+  function showToast(msg) {
+    const el = document.getElementById('timer-toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    if (_toastTimeout) clearTimeout(_toastTimeout);
+    _toastTimeout = setTimeout(() => el.classList.remove('show'), 4500);
+  }
+
+  function renderTimerBar() {
+    const bar = document.getElementById('timer-bar');
+    const names = Object.keys(activeTimers);
+    if (!names.length) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    const chips = names.map(name => {
+      const remaining = Math.max(0, activeTimers[name].endTime - Date.now());
+      const mins = Math.floor(remaining / 60000);
+      const secs = Math.floor((remaining % 60000) / 1000);
+      const expiring = remaining < 60000;
+      const safeId = name.replace(/[^a-zA-Z0-9]/g,'_');
+      return '<div class="timer-chip' + (expiring ? ' expiring' : '') +
+        '" onclick="clearTimerByName('' + name.replace(/'/g,"\'") + '')" title="Tap to cancel">' +
+        '<span class="tc-name">' + name + '</span>' +
+        '<span class="tc-time">' + mins + ':' + String(secs).padStart(2,'0') + '</span>' +
+        '<span class="tc-x">✕</span></div>';
+    }).join('');
+    bar.innerHTML = chips;
+  }
+</script>
+
+<script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
@@ -2067,6 +2278,12 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     document.addEventListener('touchcancel', reset);
   })();
 </script>
+
+<!-- Floating Timer Bar -->
+<div id="timer-bar"></div>
+
+<!-- Timer Alert Toast -->
+<div id="timer-toast"></div>
 
 </body>
 </html>
