@@ -883,6 +883,70 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       color: #6DC99A;
     }
     [data-theme="dark"] .swatch-label { color: var(--text-dark); }
+
+    /* ── Checklist Mode ── */
+    #instr-card.checklist-mode li { cursor:pointer; -webkit-user-select:none; user-select:none; }
+    #instr-card.checklist-mode li:active { opacity:0.75; }
+    #instr-card.checklist-mode li.done .step-num { background:#2e7d4f !important; color:#fff !important; }
+    #instr-card.checklist-mode li.done .step-body { opacity:0.42; }
+    #instr-card.checklist-mode li.done .step-body > span:first-child { text-decoration:line-through; }
+    .step-body { flex:1; min-width:0; }
+    .checklist-badge { display:none; font-size:0.75rem; color:var(--amber); font-weight:700; }
+    #instr-card.checklist-mode .checklist-badge { display:inline; }
+    .checklist-toggle-btn {
+      display:flex; align-items:center; gap:0.3rem;
+      background:var(--cream-light); border:1.5px solid var(--cream-border);
+      border-radius:16px; padding:0.3rem 0.7rem; font-size:0.78rem; font-weight:700;
+      color:var(--text-mid); cursor:pointer; white-space:nowrap;
+    }
+    #instr-card.checklist-mode .checklist-toggle-btn {
+      background:var(--amber); border-color:var(--amber); color:#fff;
+    }
+    #checklist-reset { display:none; }
+    #instr-card.checklist-mode #checklist-reset { display:inline; }
+
+    /* ── Timer Buttons ── */
+    .timer-btns { display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.45rem; align-items:center; }
+    .timer-btn {
+      background:var(--amber-light); border:none; border-radius:12px;
+      padding:0.25rem 0.65rem; font-size:0.76rem; font-weight:700;
+      color:var(--brown-dark); cursor:pointer;
+    }
+    .timer-btn.running {
+      background:var(--amber); color:#fff;
+      animation:timer-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes timer-pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+
+    /* ── Floating Timer Bar ── */
+    #timer-bar {
+      display:none; position:fixed; bottom:62px; left:0; right:0; z-index:90;
+      padding:0.45rem 0.75rem;
+      background:rgba(26,58,107,0.96);
+      -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+      box-shadow:0 -2px 16px rgba(0,0,0,0.28);
+      flex-wrap:wrap; gap:0.4rem; align-items:center;
+    }
+    #timer-bar::before { content:'\26F1  '; font-size:0.85rem; color:rgba(255,255,255,0.5); }
+    .timer-chip {
+      display:flex; align-items:center; gap:0.35rem;
+      background:rgba(255,255,255,0.13); border-radius:20px;
+      padding:0.3rem 0.6rem 0.3rem 0.75rem; cursor:pointer;
+    }
+    .tc-name { font-size:0.74rem; font-weight:600; color:rgba(255,255,255,0.85); }
+    .tc-time { font-size:0.82rem; font-weight:700; color:#ffd08a; font-variant-numeric:tabular-nums; min-width:2.6rem; }
+    .tc-x { font-size:0.68rem; color:rgba(255,255,255,0.45); margin-left:0.1rem; }
+    .timer-chip.expiring { background:rgba(210,50,50,0.55); animation:timer-pulse 0.75s ease-in-out infinite; }
+
+    /* ── Timer Alert Toast ── */
+    #timer-toast {
+      display:none; position:fixed; top:1rem; left:50%; transform:translateX(-50%) scale(0.9);
+      z-index:210; background:var(--brown-dark); color:#fff; border-radius:14px;
+      padding:0.75rem 1.4rem; font-size:0.9rem; font-weight:700;
+      box-shadow:0 6px 28px rgba(0,0,0,0.4); text-align:center;
+      opacity:0; transition:transform 0.2s, opacity 0.2s;
+    }
+    #timer-toast.show { display:block; transform:translateX(-50%) scale(1); opacity:1; }
   </style>
 </head>
 <body>

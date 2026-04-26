@@ -1,4 +1,4 @@
-const CACHE = 'orban-guide-v20';
+const CACHE = 'orban-guide-v21';
 const ASSETS = [
   '/',
   '/index.html',
