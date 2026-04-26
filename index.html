@@ -948,6 +948,40 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       opacity:0; transition:transform 0.2s, opacity 0.2s;
     }
     #timer-toast.show { display:block; transform:translateX(-50%) scale(1); opacity:1; }
+
+    /* ── Inventory Tab ── */
+    .inv-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0.6rem 0; border-bottom:1px solid var(--cream-border);
+      gap:0.75rem;
+    }
+    .inv-row:last-of-type { border-bottom:none; }
+    .inv-label { display:flex; flex-direction:column; gap:0.1rem; }
+    .inv-brand { font-size:0.9rem; font-weight:600; color:var(--text-dark); }
+    .inv-sub   { font-size:0.72rem; color:var(--text-light); }
+    .inv-input-wrap { display:flex; align-items:center; gap:0; }
+    .inv-stepper {
+      width:2.2rem; height:2.2rem; border:1px solid var(--cream-border);
+      background:var(--cream-light,#EDF3FB); color:var(--text-dark);
+      font-size:1.1rem; font-weight:700; cursor:pointer; line-height:1;
+      display:flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .inv-stepper:first-child { border-radius:8px 0 0 8px; }
+    .inv-stepper:last-child  { border-radius:0 8px 8px 0; }
+    .inv-count {
+      width:3.2rem; height:2.2rem; border:1px solid var(--cream-border);
+      border-left:none; border-right:none; text-align:center;
+      font-size:0.95rem; font-weight:700; color:var(--text-dark);
+      background:var(--card-bg); outline:none;
+    }
+    .inv-total-row {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:0.75rem; padding-top:0.6rem;
+      border-top:2px solid var(--cream-border);
+      font-size:0.88rem; font-weight:700; color:var(--text-dark);
+    }
+    .inv-total-val { font-size:1.05rem; color:var(--amber); }
   </style>
 </head>
 <body>
@@ -1544,6 +1578,113 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   <strong>St. Maurice & St. Verena Coptic Orthodox Church</strong><br>
   God bless your service ✝
 </footer>
+<div id="tab-inventory" class="tab-panel">
+<main>
+  <div class="results-header" style="padding-top:0.25rem;">
+    <h2>Inventory</h2>
+    <p>End-of-week stock count</p>
+  </div>
+
+  <!-- Flour Stock -->
+  <div class="card">
+    <div class="card-title">🌾 Flour Stock</div>
+
+    <div class="inv-row">
+      <div class="inv-label">
+        <span class="inv-brand">Creative Baker</span>
+        <span class="inv-sub">20 kg bags</span>
+      </div>
+      <div class="inv-input-wrap">
+        <button class="inv-stepper" onclick="invStep('inv-cb20',-1)">−</button>
+        <input type="number" id="inv-cb20" class="inv-count" value="0" min="0" step="1" oninput="invUpdate()">
+        <button class="inv-stepper" onclick="invStep('inv-cb20',1)">+</button>
+      </div>
+    </div>
+
+    <div class="inv-row">
+      <div class="inv-label">
+        <span class="inv-brand">Creative Baker</span>
+        <span class="inv-sub">10 kg bags</span>
+      </div>
+      <div class="inv-input-wrap">
+        <button class="inv-stepper" onclick="invStep('inv-cb10',-1)">−</button>
+        <input type="number" id="inv-cb10" class="inv-count" value="0" min="0" step="1" oninput="invUpdate()">
+        <button class="inv-stepper" onclick="invStep('inv-cb10',1)">+</button>
+      </div>
+    </div>
+
+    <div class="inv-row" style="align-items:flex-start;">
+      <div class="inv-label">
+        <span class="inv-brand">Other Brand</span>
+        <span class="inv-sub">bags</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.35rem;align-items:flex-end;">
+        <div class="inv-input-wrap">
+          <button class="inv-stepper" onclick="invStep('inv-other-count',-1)">−</button>
+          <input type="number" id="inv-other-count" class="inv-count" value="0" min="0" step="1" oninput="invUpdate()">
+          <button class="inv-stepper" onclick="invStep('inv-other-count',1)">+</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <span style="font-size:0.75rem;color:var(--text-light);">kg per bag</span>
+          <input type="number" id="inv-other-kg" class="inv-count" value="10" min="1" step="1" style="width:3.5rem;" oninput="invUpdate()">
+        </div>
+      </div>
+    </div>
+
+    <div class="inv-total-row">
+      <span>Total Flour</span>
+      <span id="inv-flour-total" class="inv-total-val">0 kg</span>
+    </div>
+  </div>
+
+  <!-- Other Stock -->
+  <div class="card">
+    <div class="card-title">📦 Other Stock</div>
+
+    <div class="inv-row">
+      <div class="inv-label">
+        <span class="inv-brand">Yeast</span>
+        <span class="inv-sub">boxes</span>
+      </div>
+      <div class="inv-input-wrap">
+        <button class="inv-stepper" onclick="invStep('inv-yeast',-1)">−</button>
+        <input type="number" id="inv-yeast" class="inv-count" value="0" min="0" step="1" oninput="invUpdate()">
+        <button class="inv-stepper" onclick="invStep('inv-yeast',1)">+</button>
+      </div>
+    </div>
+
+    <div class="inv-row">
+      <div class="inv-label">
+        <span class="inv-brand">Scalding Dough</span>
+        <span class="inv-sub">kg remaining</span>
+      </div>
+      <div class="inv-input-wrap">
+        <button class="inv-stepper" onclick="invStep('inv-scald',-0.5)">−</button>
+        <input type="number" id="inv-scald" class="inv-count" value="0" min="0" step="0.5" oninput="invUpdate()">
+        <button class="inv-stepper" onclick="invStep('inv-scald',0.5)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="card">
+    <div class="card-title">📝 Notes</div>
+    <textarea id="inv-notes" rows="3" placeholder="Any notes for the team (e.g. flour nearing expiry, yeast brand change)…" oninput="invUpdate()" style="width:100%;box-sizing:border-box;border:1px solid var(--cream-border);border-radius:8px;padding:0.6rem 0.75rem;font-family:inherit;font-size:0.9rem;background:var(--card-bg);color:var(--text-main);resize:vertical;outline:none;"></textarea>
+  </div>
+
+  <!-- Summary + Share -->
+  <div class="card" style="background:var(--amber);border:none;">
+    <div id="inv-summary" style="font-size:0.88rem;color:#fff;line-height:1.7;margin-bottom:0.75rem;"></div>
+    <button onclick="invShare()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.5rem;background:#fff;color:var(--amber);border:none;border-radius:10px;padding:0.65rem;font-size:0.95rem;font-weight:700;cursor:pointer;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      Share with Leaders
+    </button>
+    <div style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.65);margin-top:0.5rem;" id="inv-saved-stamp"></div>
+  </div>
+
+</main>
+</div><!-- end tab-inventory -->
+
 <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
 
   <!-- Home -->
@@ -1573,6 +1714,17 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
     </svg>
     <span>Settings</span>
+  </button>
+
+
+  <!-- Inventory -->
+  <button class="nav-btn" data-tab="inventory" aria-label="Inventory">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="2" y="3" width="20" height="14" rx="2"/>
+      <path d="M8 21h8M12 17v4"/>
+      <path d="M7 8h4M7 11h6"/>
+    </svg>
+    <span>Inventory</span>
   </button>
 
 </nav>
@@ -2380,6 +2532,132 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
     document.addEventListener('touchcancel', reset);
   })();
+</script>
+
+<script>
+  // ── Inventory Tab ──
+  const INV_KEY = 'orban-inventory';
+
+  function invGet(id) {
+    const el = document.getElementById(id);
+    return el ? (parseFloat(el.value) || 0) : 0;
+  }
+
+  function invStep(id, delta) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = parseFloat(el.value) || 0;
+    el.value = Math.max(0, +(val + delta).toFixed(2));
+    invUpdate();
+  }
+
+  function invUpdate() {
+    const cb20  = invGet('inv-cb20');
+    const cb10  = invGet('inv-cb10');
+    const other = invGet('inv-other-count');
+    const otherKg = invGet('inv-other-kg') || 10;
+    const yeast  = invGet('inv-yeast');
+    const scald  = invGet('inv-scald');
+    const notes  = (document.getElementById('inv-notes') || {}).value || '';
+
+    const totalFlour = (cb20 * 20) + (cb10 * 10) + (other * otherKg);
+    const flourEl = document.getElementById('inv-flour-total');
+    if (flourEl) flourEl.textContent = totalFlour.toFixed(1) + ' kg';
+
+    // Build summary
+    const parts = [];
+    if (cb20  > 0) parts.push(cb20  + ' × Creative Baker 20 kg = ' + (cb20*20)  + ' kg');
+    if (cb10  > 0) parts.push(cb10  + ' × Creative Baker 10 kg = ' + (cb10*10)  + ' kg');
+    if (other > 0) parts.push(other + ' × Other ' + otherKg + ' kg = ' + (other*otherKg) + ' kg');
+    const flourLine = parts.length ? parts.join('
+') + '
+Total flour: ' + totalFlour.toFixed(1) + ' kg' : 'No flour recorded';
+
+    const sumEl = document.getElementById('inv-summary');
+    if (sumEl) {
+      sumEl.innerHTML =
+        '<strong style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;opacity:0.7;">Flour</strong><br>' +
+        parts.map(p => '• ' + p).join('<br>') +
+        (parts.length ? '<br><strong>Total: ' + totalFlour.toFixed(1) + ' kg</strong>' : '• No flour recorded') +
+        '<br><br><strong style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;opacity:0.7;">Other Stock</strong><br>' +
+        '• Yeast: ' + yeast + ' box' + (yeast !== 1 ? 'es' : '') + '<br>' +
+        '• Scalding Dough: ' + scald + ' kg';
+    }
+
+    // Auto-save to localStorage
+    const stamp = new Date().toLocaleString('en-AU', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    const data = { cb20, cb10, other, otherKg, yeast, scald, notes, stamp };
+    try { localStorage.setItem(INV_KEY, JSON.stringify(data)); } catch(e) {}
+    const stampEl = document.getElementById('inv-saved-stamp');
+    if (stampEl) stampEl.textContent = 'Last updated ' + stamp;
+  }
+
+  function invShare() {
+    const cb20  = invGet('inv-cb20');
+    const cb10  = invGet('inv-cb10');
+    const other = invGet('inv-other-count');
+    const otherKg = invGet('inv-other-kg') || 10;
+    const yeast  = invGet('inv-yeast');
+    const scald  = invGet('inv-scald');
+    const notes  = (document.getElementById('inv-notes') || {}).value || '';
+    const totalFlour = (cb20*20) + (cb10*10) + (other*otherKg);
+
+    const date = new Date().toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    const lines = [
+      '📦 Orban Inventory Report',
+      date,
+      '',
+      '🌾 Flour Stock',
+    ];
+    if (cb20  > 0) lines.push('  • Creative Baker 20 kg: ' + cb20  + ' bag' + (cb20  !== 1 ? 's' : '') + ' (' + (cb20*20)  + ' kg)');
+    if (cb10  > 0) lines.push('  • Creative Baker 10 kg: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10*10)  + ' kg)');
+    if (other > 0) lines.push('  • Other (' + otherKg + ' kg bags): ' + other + ' bag' + (other !== 1 ? 's' : '') + ' (' + (other*otherKg) + ' kg)');
+    lines.push('  Total: ' + totalFlour.toFixed(1) + ' kg');
+    lines.push('');
+    lines.push('📦 Other Stock');
+    lines.push('  • Yeast: ' + yeast + ' box' + (yeast !== 1 ? 'es' : ''));
+    lines.push('  • Scalding Dough: ' + scald + ' kg');
+    if (notes) { lines.push(''); lines.push('📝 Notes'); lines.push('  ' + notes); }
+    lines.push('');
+    lines.push('— St. Maurice & St. Verena Orban Leaders');
+
+    const text = lines.join('
+');
+
+    if (navigator.share) {
+      navigator.share({ title: 'Orban Inventory', text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text)
+        .then(() => alert('Copied to clipboard!'))
+        .catch(() => alert(text));
+    }
+  }
+
+  function invLoad() {
+    try {
+      const raw = localStorage.getItem(INV_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+      set('inv-cb20',         d.cb20);
+      set('inv-cb10',         d.cb10);
+      set('inv-other-count',  d.other);
+      set('inv-other-kg',     d.otherKg != null ? d.otherKg : 10);
+      set('inv-yeast',        d.yeast);
+      set('inv-scald',        d.scald);
+      const notesEl = document.getElementById('inv-notes');
+      if (notesEl && d.notes) notesEl.value = d.notes;
+      invUpdate();
+    } catch(e) {}
+  }
+
+  // Load saved inventory on page start
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', invLoad);
+  } else {
+    invLoad();
+  }
 </script>
 
 <!-- Floating Timer Bar -->
