@@ -685,13 +685,105 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       animation: ptr-spin 0.6s linear infinite;
     }
     @keyframes ptr-spin { to { transform: rotate(360deg); } }
+
+    /* ── Bottom Nav ── */
+    body { padding-bottom: 68px; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 68px;
+      background: var(--brown-dark);
+      display: flex;
+      align-items: stretch;
+      z-index: 200;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s;
+      padding: 0 0.5rem;
+    }
+    .nav-btn .nav-icon { font-size: 1.4rem; line-height: 1; }
+    .nav-btn:hover { color: rgba(255,255,255,0.8); }
+    .nav-btn.active { color: var(--amber-light); }
+    .nav-btn.active .nav-icon { filter: drop-shadow(0 0 4px rgba(91,157,232,0.6)); }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── FAQ ── */
+    .faq-section { margin-bottom: 0.75rem; }
+    .faq-item {
+      background: var(--white);
+      border: 1px solid var(--cream-border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .faq-q {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: calc(0.95rem * var(--font-scale));
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      gap: 0.75rem;
+    }
+    .faq-q .faq-chevron {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-a {
+      display: none;
+      padding: 0 1.25rem 1.1rem;
+      color: var(--text-mid);
+      font-size: calc(0.9rem * var(--font-scale));
+      line-height: 1.65;
+      border-top: 1px solid var(--cream-border);
+    }
+    .faq-item.open .faq-a { display: block; }
+    .faq-a ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+    .faq-a ul li { margin-bottom: 0.35rem; }
+    .faq-a h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      margin: 0.85rem 0 0.35rem;
+    }
+    .faq-a h4:first-child { margin-top: 0.6rem; }
   </style>
 </head>
 <body>
 <div id="ptr-indicator"><div class="ptr-spinner"></div></div>
 
 <header>
-  <button class="settings-btn" id="settings-toggle" aria-label="Settings">⚙</button>
   <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
   <div class="church-logo">
     <img class="smsv-logo" src="orban-logo.png" alt="Orban Guide">
@@ -700,6 +792,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   <h2 class="header-sub">St. Maurice & St. Verena Coptic Orthodox Church</h2>
 </header>
 
+<div id="tab-home" class="tab-panel active">
 <main>
 
 <!-- Mode Selector -->
@@ -711,70 +804,6 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     </div>
   </div>
 
-  <!-- Settings Panel -->
-  <div id="settings-body" style="display:none;">
-
-      <div class="instr-section-label" style="margin-top:1rem;">Display</div>
-      <div class="settings-grid">
-        <div class="settings-row">
-          <label>Font Size</label>
-          <select id="s-fontsize" aria-label="Font size" style="padding:0.4rem 0.6rem;border:1px solid var(--cream-border);border-radius:var(--radius-sm);font-size:0.9rem;color:var(--text-dark);background:var(--cream);">
-            <option value="1">Normal</option>
-            <option value="1.2">Large</option>
-            <option value="1.4">Extra Large</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="instr-section-label" style="margin-top:1rem;">Recipe Parameters</div>
-      <div class="settings-grid">
-        <div class="settings-row">
-          <label>Yeast (g per kg flour)</label>
-          <input type="number" id="s-yeast" aria-label="Yeast grams per kg flour" value="4" min="0.1" max="20" step="0.1">
-        </div>
-      </div>
-
-      <div class="instr-section-label" style="margin-top:1rem;">Liturgy Defaults</div>
-      <table class="settings-table">
-        <thead>
-          <tr><th>Day</th><th>Flour (kg)</th><th>Orban</th><th>Size (g)</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Tuesday</td>
-            <td><input type="number" id="s-tue-flour" value="3" min="0.1" step="0.5"></td>
-            <td><input type="number" id="s-tue-loaves" value="12" min="1" step="1"></td>
-            <td><input type="number" id="s-tue-size" value="265" min="1" step="10"></td>
-          </tr>
-          <tr>
-            <td>Thursday</td>
-            <td><input type="number" id="s-thu-flour" value="4" min="0.1" step="0.5"></td>
-            <td><input type="number" id="s-thu-loaves" value="18" min="1" step="1"></td>
-            <td><input type="number" id="s-thu-size" value="338" min="1" step="10"></td>
-          </tr>
-          <tr>
-            <td>Saturday</td>
-            <td><input type="number" id="s-sat-flour" value="7" min="0.1" step="0.5"></td>
-            <td><input type="number" id="s-sat-loaves" value="15" min="1" step="1"></td>
-            <td><input type="number" id="s-sat-size" value="625" min="1" step="10"></td>
-          </tr>
-          <tr>
-            <td>Sunday 1st</td>
-            <td rowspan="2"><input type="number" id="s-sun-flour" value="30" min="0.1" step="0.5"></td>
-            <td><input type="number" id="s-sun-loaves1" value="12" min="1" step="1"></td>
-            <td><input type="number" id="s-sun-size1" value="375" min="1" step="10"></td>
-          </tr>
-          <tr>
-            <td>Sunday 2nd</td>
-            <td><input type="number" id="s-sun-loaves2" value="28" min="1" step="1"></td>
-            <td><input type="number" id="s-sun-size2" value="1425" min="1" step="10"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div><!-- end settings-body -->
-
-  <div id="app-content">
   <!-- Liturgy Selector -->
   <div class="card">
     <div class="card-title">Select Your Liturgy</div>
@@ -965,23 +994,226 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     <span class="icon">⚠️</span>
     <span><strong>Important:</strong> Only use <strong>Costco flour</strong> for this recipe. Results may vary with other flour brands.</span>
   </div>
-  </div><!-- end app-content -->
 
 </main>
+</div><!-- end tab-home -->
 
+
+<div id="tab-faq" class="tab-panel">
+<main>
+  <div class="results-header" style="padding-top:0.25rem;">
+    <h2>Frequently Asked Questions</h2>
+    <p>Guidelines for baking, cleaning & packing</p>
+  </div>
+
+  <!-- Room Cleaning -->
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      🧹 Room Cleaning
+      <span class="faq-chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      <h4>Floors</h4>
+      <ul>
+        <li>Sweep the entire Orban room floor thoroughly, including under tables and equipment.</li>
+        <li>Mop with a clean mop and food-safe cleaning solution.</li>
+        <li>Pay special attention to corners and edges where flour collects.</li>
+        <li>Allow floor to dry fully before leaving the room.</li>
+      </ul>
+      <h4>Table Surfaces</h4>
+      <ul>
+        <li>Wipe down all table surfaces, counters, and work benches with a food-safe cleaner.</li>
+        <li>Remove any leftover flour, dough, or residue completely.</li>
+        <li>Wipe the stamp rack and rolling pin storage area.</li>
+        <li>Clean the inside and outside of all trays and cooling racks.</li>
+      </ul>
+      <h4>Machines &amp; Equipment</h4>
+      <ul>
+        <li><strong>Mixer:</strong> Remove bowl and dough hook, wash thoroughly. Wipe down exterior and base. Ensure no dough residue remains on the hook or bowl walls.</li>
+        <li><strong>Proofer:</strong> Wipe interior walls and floor of the proofer with a damp cloth. Remove any moisture or residue.</li>
+        <li><strong>Ovens:</strong> Once cooled, wipe interior surfaces. Check that no Orban pieces or crumbs remain inside.</li>
+        <li>Return all stamps, rollers, and tools to their designated storage locations.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Packing the Orban -->
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      📦 Packing the Orban
+      <span class="faq-chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      <h4>Cooling First</h4>
+      <ul>
+        <li>Allow Orban to cool completely before packing — packing warm bread causes condensation and sogginess.</li>
+        <li>Cover loosely with a clean cloth while cooling to retain moisture without trapping steam.</li>
+      </ul>
+      <h4>Packing</h4>
+      <ul>
+        <li>Handle each Orban gently — avoid pressing on the top stamp pattern.</li>
+        <li>Place <em>Hamal Orban</em> (the Communion loaf) separately at the front with extra care.</li>
+        <li>Pack each Orban individually in a clean bag or wrap to maintain freshness.</li>
+        <li>Label bags if multiple liturgies are being prepared (e.g., 1st vs 2nd Liturgy sizes).</li>
+        <li>Store packed Orban in a clean, dry location away from strong odors.</li>
+      </ul>
+      <h4>Storage Tips</h4>
+      <ul>
+        <li>Use within 24 hours for best quality.</li>
+        <li>If baking the night before, store at room temperature in sealed bags — do not refrigerate.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Friday & Saturday Night Extra -->
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      🌙 Friday &amp; Saturday Night Extra
+      <span class="faq-chevron">▼</span>
+    </button>
+    <div class="faq-a">
+      <h4>When to Make Extra</h4>
+      <ul>
+        <li>Friday night and Saturday night batches should account for extra Orban needed for <strong>Sunday church activities</strong> — Sunday School, youth meetings, and any special events.</li>
+        <li>Check with the Orban leaders group in advance if there are any extra requests for the weekend.</li>
+      </ul>
+      <h4>How Much Extra</h4>
+      <ul>
+        <li>For a standard weekend, add <strong>10–20% more</strong> than the usual liturgy amount.</li>
+        <li>For special occasions (feast days, large gatherings), coordinate directly with the priest or deacon to determine the required count.</li>
+        <li>Use the <strong>Override Parameters</strong> on the Home screen to adjust the count and size before calculating your batch.</li>
+      </ul>
+      <h4>Timing</h4>
+      <ul>
+        <li>Start Friday night prep early enough so Orban are fully cooled and packed before midnight.</li>
+        <li>Saturday night batches should be baked and packed by 11 PM to ensure freshness for Sunday morning.</li>
+        <li>Always report flour and yeast inventory to the Orban leaders group after each bake.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Note banner -->
+  <div class="note-banner" style="margin-top:0.25rem;">
+    <span class="icon">✝</span>
+    <span>For questions not covered here, contact the Orban leaders group or speak to a deacon.</span>
+  </div>
+
+</main>
+</div><!-- end tab-faq -->
+
+<div id="tab-settings" class="tab-panel">
+<main>
+  <div class="results-header" style="padding-top:0.25rem;">
+    <h2>Settings</h2>
+    <p>Adjust display and recipe defaults</p>
+  </div>
+  <div class="card">
+    <div class="instr-section-label" style="margin-top:1rem;">Display</div>
+      <div class="settings-grid">
+        <div class="settings-row">
+          <label>Font Size</label>
+          <select id="s-fontsize" aria-label="Font size" style="padding:0.4rem 0.6rem;border:1px solid var(--cream-border);border-radius:var(--radius-sm);font-size:0.9rem;color:var(--text-dark);background:var(--cream);">
+            <option value="1">Normal</option>
+            <option value="1.2">Large</option>
+            <option value="1.4">Extra Large</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="instr-section-label" style="margin-top:1rem;">Recipe Parameters</div>
+      <div class="settings-grid">
+        <div class="settings-row">
+          <label>Yeast (g per kg flour)</label>
+          <input type="number" id="s-yeast" aria-label="Yeast grams per kg flour" value="4" min="0.1" max="20" step="0.1">
+        </div>
+      </div>
+
+      <div class="instr-section-label" style="margin-top:1rem;">Liturgy Defaults</div>
+      <table class="settings-table">
+        <thead>
+          <tr><th>Day</th><th>Flour (kg)</th><th>Orban</th><th>Size (g)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tuesday</td>
+            <td><input type="number" id="s-tue-flour" value="3" min="0.1" step="0.5"></td>
+            <td><input type="number" id="s-tue-loaves" value="12" min="1" step="1"></td>
+            <td><input type="number" id="s-tue-size" value="265" min="1" step="10"></td>
+          </tr>
+          <tr>
+            <td>Thursday</td>
+            <td><input type="number" id="s-thu-flour" value="4" min="0.1" step="0.5"></td>
+            <td><input type="number" id="s-thu-loaves" value="18" min="1" step="1"></td>
+            <td><input type="number" id="s-thu-size" value="338" min="1" step="10"></td>
+          </tr>
+          <tr>
+            <td>Saturday</td>
+            <td><input type="number" id="s-sat-flour" value="7" min="0.1" step="0.5"></td>
+            <td><input type="number" id="s-sat-loaves" value="15" min="1" step="1"></td>
+            <td><input type="number" id="s-sat-size" value="625" min="1" step="10"></td>
+          </tr>
+          <tr>
+            <td>Sunday 1st</td>
+            <td rowspan="2"><input type="number" id="s-sun-flour" value="30" min="0.1" step="0.5"></td>
+            <td><input type="number" id="s-sun-loaves1" value="12" min="1" step="1"></td>
+            <td><input type="number" id="s-sun-size1" value="375" min="1" step="10"></td>
+          </tr>
+          <tr>
+            <td>Sunday 2nd</td>
+            <td><input type="number" id="s-sun-loaves2" value="28" min="1" step="1"></td>
+            <td><input type="number" id="s-sun-size2" value="1425" min="1" step="10"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+</div><!-- end tab-settings -->
 <footer>
   <strong>St. Maurice & St. Verena Coptic Orthodox Church</strong><br>
   God bless your service ✝
 </footer>
+<nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+  <button class="nav-btn active" data-tab="home" aria-label="Home">
+    <span class="nav-icon">🏠</span>
+    <span>Home</span>
+  </button>
+  <button class="nav-btn" data-tab="faq" aria-label="FAQ">
+    <span class="nav-icon">❓</span>
+    <span>FAQ</span>
+  </button>
+  <button class="nav-btn" data-tab="settings" aria-label="Settings">
+    <span class="nav-icon">⚙️</span>
+    <span>Settings</span>
+  </button>
+</nav>
 
 <script>
-  // ── Settings ──
-  document.getElementById('settings-toggle').addEventListener('click', () => {
-    const body    = document.getElementById('settings-body');
-    const app     = document.getElementById('app-content');
-    const open    = body.style.display === 'none';
-    body.style.display = open ? 'block' : 'none';
-    app.style.display  = open ? 'none'  : 'block';
+  // ── Bottom nav / tab switching ──
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+    });
+  });
+
+  // ── FAQ accordion ──
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
   });
 
   document.getElementById('s-fontsize').addEventListener('change', function() {
