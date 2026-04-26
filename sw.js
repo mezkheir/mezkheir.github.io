@@ -1,4 +1,4 @@
-const CACHE = 'orban-guide-v17';
+const CACHE = 'orban-guide-v18';
 const ASSETS = [
   '/',
   '/index.html',
@@ -25,8 +25,19 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Network-first: always try the network, fall back to cache when offline
 self.addEventListener('fetch', e => {
+  // Only handle GET requests
+  if (e.request.method !== 'GET') return;
+
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request)
+      .then(res => {
+        // Update cache with fresh response
+        const copy = res.clone();
+        caches.open(CACHE).then(cache => cache.put(e.request, copy));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
