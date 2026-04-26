@@ -684,17 +684,17 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     @keyframes ptr-spin { to { transform: rotate(360deg); } }
 
     /* ── Bottom Nav ── */
-    body { padding-bottom: 68px; }
+    body { padding-bottom: 62px; }
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
-      height: 68px;
-      background: var(--brown-dark);
+      background: var(--white);
       display: flex;
       align-items: stretch;
       z-index: 200;
-      border-top: 1px solid rgba(255,255,255,0.12);
+      border-top: 1px solid var(--cream-border);
       padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
     }
     .nav-btn {
       flex: 1;
@@ -702,22 +702,35 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.2rem;
+      gap: 0.18rem;
       background: none;
       border: none;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      color: var(--text-light);
+      font-size: 0.6rem;
+      font-weight: 500;
       cursor: pointer;
       transition: color 0.15s;
-      padding: 0 0.5rem;
+      padding: 0.6rem 0.25rem 0.5rem;
+      -webkit-tap-highlight-color: transparent;
     }
-    .nav-btn .nav-icon { font-size: 1.4rem; line-height: 1; }
-    .nav-btn:hover { color: rgba(255,255,255,0.8); }
-    .nav-btn.active { color: var(--amber-light); }
-    .nav-btn.active .nav-icon { filter: drop-shadow(0 0 4px rgba(91,157,232,0.6)); }
+    .nav-btn svg {
+      width: 26px; height: 26px;
+      stroke: var(--text-light);
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.15s, fill 0.15s;
+    }
+    .nav-btn span { transition: color 0.15s; }
+    .nav-btn.active { color: var(--brown-dark); }
+    .nav-btn.active svg {
+      stroke: var(--brown-dark);
+    }
+    /* filled style for active home icon */
+    .nav-btn.active .icon-home-fill { fill: var(--brown-dark); stroke: var(--brown-dark); }
+    .nav-btn:not(.active):hover { color: var(--text-mid); }
+    .nav-btn:not(.active):hover svg { stroke: var(--text-mid); }
 
     /* ── Tab panels ── */
     .tab-panel { display: none; }
@@ -1287,22 +1300,46 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   God bless your service ✝
 </footer>
 <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+
+  <!-- Home -->
   <button class="nav-btn active" data-tab="home" aria-label="Home">
-    <span class="nav-icon">🏠</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <!-- outline (inactive) -->
+      <path class="icon-home-outline" d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1H15v-5h-6v5H4a1 1 0 01-1-1V10.5z"/>
+      <!-- filled chimney dot for active, reuse path with fill -->
+      <path class="icon-home-fill" style="display:none" d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1H15v-5h-6v5H4a1 1 0 01-1-1V10.5z"/>
+    </svg>
     <span>Home</span>
   </button>
+
+  <!-- FAQ -->
   <button class="nav-btn" data-tab="faq" aria-label="FAQ">
-    <span class="nav-icon">❓</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 17v.5M12 13.5a2 2 0 10-2-2 2 2 0 012-2v1"/>
+    </svg>
     <span>FAQ</span>
   </button>
+
+  <!-- Settings -->
   <button class="nav-btn" data-tab="settings" aria-label="Settings">
-    <span class="nav-icon">⚙️</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+    </svg>
     <span>Settings</span>
   </button>
+
 </nav>
 
 <script>
   // ── Bottom nav / tab switching ──
+  function updateHomeIcon() {
+    const homeBtn = document.querySelector('.nav-btn[data-tab="home"]');
+    const isActive = homeBtn.classList.contains('active');
+    homeBtn.querySelector('.icon-home-outline').style.display = isActive ? 'none' : '';
+    homeBtn.querySelector('.icon-home-fill').style.display    = isActive ? ''     : 'none';
+  }
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
@@ -1310,8 +1347,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('tab-' + tab).classList.add('active');
+      updateHomeIcon();
     });
   });
+  updateHomeIcon(); // set initial state
 
   // ── FAQ accordion ──
   document.querySelectorAll('.faq-q').forEach(btn => {
