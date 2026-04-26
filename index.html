@@ -988,7 +988,13 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   <div id="results">
 
     <div class="results-header">
-      <h2>Your Recipe</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+        <h2 style="margin:0;">Your Recipe</h2>
+        <button id="share-btn" onclick="shareResults()" title="Share batch via iMessage or WhatsApp" style="display:none;align-items:center;gap:0.35rem;background:var(--amber);color:#fff;border:none;border-radius:20px;padding:0.4rem 0.85rem;font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share
+        </button>
+      </div>
       <p id="results-summary"></p>
     </div>
 
@@ -1040,6 +1046,16 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     </div>
 
   </div>
+
+    <!-- Notes & Save -->
+    <div class="card" id="batch-notes-card" style="display:none;">
+      <div class="card-title">Batch Notes</div>
+      <textarea id="batch-notes" rows="3" placeholder="Add any notes about this batch (e.g. dough consistency, adjustments, timing)…" style="width:100%;box-sizing:border-box;border:1px solid var(--cream-border);border-radius:8px;padding:0.6rem 0.75rem;font-family:inherit;font-size:0.9rem;background:var(--card-bg);color:var(--text-main);resize:vertical;outline:none;"></textarea>
+      <button onclick="saveBatch()" style="margin-top:0.6rem;width:100%;background:var(--brown-dark);color:#fff;border:none;border-radius:10px;padding:0.55rem;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.03em;">
+        💾 Save to History
+      </button>
+      <div id="save-confirm" style="display:none;text-align:center;font-size:0.82rem;color:var(--amber);margin-top:0.4rem;font-weight:600;">✓ Batch saved!</div>
+    </div>
 
   <!-- Instructions -->
   <div class="card">
@@ -1100,6 +1116,15 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   <div class="note-banner">
     <span class="icon">⚠️</span>
     <span><strong>Important:</strong> Only use <strong>Costco flour</strong> for this recipe. Results may vary with other flour brands.</span>
+  </div>
+
+  <!-- Batch History -->
+  <div class="card" id="history-section" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+      <div class="card-title" style="margin:0;">Recent Batches</div>
+      <button onclick="clearHistory()" style="background:none;border:none;color:var(--text-light);font-size:0.78rem;cursor:pointer;padding:0.2rem 0.4rem;">Clear all</button>
+    </div>
+    <div id="history-list"></div>
   </div>
 
 </main>
@@ -1870,9 +1895,111 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
     const resultsEl = document.getElementById('results');
     resultsEl.classList.add('visible');
+
+    // Show share button and notes card
+    document.getElementById('share-btn').style.display = 'flex';
+    document.getElementById('batch-notes-card').style.display = 'block';
+
+    // Store current calc state for share/save
+    window._lastCalc = {
+      date: new Date().toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short', year:'numeric' }),
+      flour: flourKg,
+      mode: state.mode,
+      scald: state.scald,
+      yeast: state.yeastPerKgFlour,
+      totalWater: totalWater_L,
+      totalDough: totalDough_kg,
+      yeastG: yeast_g,
+      summary: document.getElementById('results-summary').textContent,
+      days: [...selectedDays].map(k => LITURGY[k].label).join(', ') || 'Custom',
+    };
   }
 
-  // Auto-select liturgy based on current day (prep day → next liturgy)
+  // ── Batch History (localStorage) ──
+  const HISTORY_KEY = 'orban-batch-history';
+  const MAX_HISTORY = 10;
+
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function saveHistory(arr) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+  }
+
+  function saveBatch() {
+    if (!window._lastCalc) return;
+    const notes = document.getElementById('batch-notes').value.trim();
+    const entry = { ...window._lastCalc, notes, id: Date.now() };
+    const arr = getHistory();
+    arr.unshift(entry);
+    if (arr.length > MAX_HISTORY) arr.length = MAX_HISTORY;
+    saveHistory(arr);
+    const confirm = document.getElementById('save-confirm');
+    confirm.style.display = 'block';
+    setTimeout(() => confirm.style.display = 'none', 2200);
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const arr = getHistory();
+    const section = document.getElementById('history-section');
+    const list = document.getElementById('history-list');
+    if (!arr.length) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    list.innerHTML = arr.map(e => `
+      <div style="border:1px solid var(--cream-border);border-radius:10px;padding:0.6rem 0.75rem;margin-bottom:0.5rem;background:var(--cream-light);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.15rem;">
+          <span style="font-weight:700;font-size:0.88rem;color:var(--brown-dark);">${e.days}</span>
+          <span style="font-size:0.75rem;color:var(--text-light);">${e.date}</span>
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-mid);">${e.summary}</div>
+        ${e.notes ? `<div style="font-size:0.8rem;color:var(--text-light);margin-top:0.25rem;font-style:italic;">"${e.notes}"</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function clearHistory() {
+    if (!confirm('Clear all batch history?')) return;
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+  }
+
+  // Share current results via Web Share API
+  function shareResults() {
+    if (!window._lastCalc) return;
+    const c = window._lastCalc;
+    const notes = document.getElementById('batch-notes').value.trim();
+    const text = [
+      '📋 Orban Guide — Batch Summary',
+      '',
+      `📅 ${c.date}`,
+      `⛪ ${c.days}`,
+      '',
+      `Dry Flour: ${c.flour >= 1 ? c.flour.toFixed(2) + ' kg' : (c.flour * 1000).toFixed(0) + ' g'}`,
+      `Total Water: ${c.totalWater >= 1 ? c.totalWater.toFixed(2) + ' L' : (c.totalWater * 1000).toFixed(0) + ' mL'}`,
+      `Dough Weight: ${c.totalDough >= 1 ? c.totalDough.toFixed(2) + ' kg' : (c.totalDough * 1000).toFixed(0) + ' g'}`,
+      `Yeast: ${Math.ceil(c.yeastG)} g`,
+      `Scald: ${Math.round(c.scald * 100)}%`,
+      notes ? '' : null,
+      notes ? `Notes: ${notes}` : null,
+      '',
+      '— Orban Guide app',
+    ].filter(l => l !== null).join('\n');
+
+    if (navigator.share) {
+      navigator.share({ title: 'Orban Batch', text }).catch(() => {});
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!')).catch(() => alert(text));
+    }
+  }
+
+  // Load history on startup
+  renderHistory();
+
+  // ── Auto-select liturgy based on current day (prep day → next liturgy)
   function defaultToNextLiturgy() {
     const prepMap = {
       0: 'sunday', 1: 'tuesday', 2: 'tuesday',
