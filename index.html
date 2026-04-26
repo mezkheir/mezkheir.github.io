@@ -72,54 +72,51 @@
     header {
       background: linear-gradient(160deg, #1A3A6B 0%, #2558A8 100%);
       color: #FFFFFF;
-      text-align: center;
-      padding: 2.5rem 1.5rem 2rem;
-      border-bottom: 3px solid rgba(255,255,255,0.3);
-    }
-    .church-logo {
       display: flex;
-      justify-content: center;
-      margin-bottom: 0.75rem;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.75rem 1rem 0.75rem 1rem;
+      border-bottom: 2px solid rgba(255,255,255,0.15);
     }
+    .church-logo { flex-shrink: 0; }
     .smsv-logo {
-      width: 90px;
-      height: 90px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid rgba(255,255,255,0.4);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255,255,255,0.35);
     }
+    .header-text { flex: 1; text-align: left; }
     header h1 {
-      font-size: clamp(1.2rem, 4vw, 1.8rem);
+      font-size: 1rem;
       font-weight: 700;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
       color: #FFFFFF;
-      margin-bottom: 0.3rem;
+      line-height: 1.2;
     }
     .header-sub {
-      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      font-size: 0.7rem;
       font-weight: 400;
-      color: rgba(255,255,255,0.7);
-      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.03em;
     }
-    .header-sub span { color: rgba(255,255,255,0.9); font-weight: 400; }
+    .header-sub span { color: rgba(255,255,255,0.85); }
 
     /* ── Theme Toggle ── */
     .theme-toggle {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
+      margin-left: auto;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 2rem;
-      padding: 0.35rem 0.75rem;
+      padding: 0.3rem 0.65rem;
       color: white;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
       transition: background 0.2s;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
-    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
-    header { position: relative; }
+    .theme-toggle:hover { background: rgba(255,255,255,0.22); }
 
     /* ── Focus styles (keyboard nav) ── */
     button:focus-visible, input:focus-visible, select:focus-visible {
@@ -847,8 +844,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   <div class="church-logo">
     <img class="smsv-logo" src="orban-logo.png" alt="Orban Guide">
   </div>
-  <h1>Orban Guide</h1>
-  <h2 class="header-sub">St. Maurice & St. Verena Coptic Orthodox Church</h2>
+  <div class="header-text">
+    <h1>Orban Guide</h1>
+    <div class="header-sub">St. Maurice &amp; St. Verena</div>
+  </div>
 </header>
 
 <div id="tab-home" class="tab-panel active">
