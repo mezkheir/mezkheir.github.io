@@ -788,6 +788,43 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     }
     .faq-a h4:first-child { margin-top: 0.6rem; }
 
+    /* ── Table layer stack ── */
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 0.75rem 0 0.5rem;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--cream-border);
+    }
+    .layer-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.55rem 0.85rem;
+      font-size: calc(0.88rem * var(--font-scale));
+      border-bottom: 1px solid var(--cream-border);
+    }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-row.layer-orban {
+      background: var(--cream-mid);
+      font-weight: 700;
+      color: var(--brown-dark);
+    }
+    .layer-dot {
+      width: 12px; height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .layer-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-light);
+      min-width: 1rem;
+      text-align: right;
+    }
+
     /* ── Bake color scale ── */
     .color-scale {
       display: flex;
@@ -1116,6 +1153,51 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       <span class="faq-chevron">▼</span>
     </button>
     <div class="faq-a">
+      <h4>Table Setup — Layering Sequence</h4>
+      <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:0.25rem;">Layer the table in this order, bottom to top:</p>
+      <div class="layer-stack">
+        <div class="layer-row">
+          <span class="layer-num">1</span>
+          <span class="layer-dot" style="background:#90CAF9;"></span>
+          <span><strong>Plastic</strong> — base layer, protects the table</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-num">2</span>
+          <span class="layer-dot" style="background:#CE93D8;"></span>
+          <span><strong>Blanket</strong> — cushioning layer</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-num">3</span>
+          <span class="layer-dot" style="background:#FFFFFF;border:1px solid var(--cream-border);"></span>
+          <span><strong>Sheet</strong> — clean linen layer</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-num">4</span>
+          <span class="layer-dot" style="background:#FFCC80;"></span>
+          <span><strong>Towel</strong> — absorbs moisture</span>
+        </div>
+        <div class="layer-row layer-orban">
+          <span class="layer-num">✝</span>
+          <span class="layer-dot" style="background:#C8953C;border:2px solid #8B6020;"></span>
+          <span>Orban placed here — <em>Hamal Orban in dedicated plastic bags</em></span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-num">5</span>
+          <span class="layer-dot" style="background:#FFCC80;"></span>
+          <span><strong>Towel</strong> — covers Orban</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-num">6</span>
+          <span class="layer-dot" style="background:#FFFFFF;border:1px solid var(--cream-border);"></span>
+          <span><strong>Sheet</strong> — clean cover layer</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-num">7</span>
+          <span class="layer-dot" style="background:#90CAF9;"></span>
+          <span><strong>Plastic</strong> — top cover, seals from air and dust</span>
+        </div>
+      </div>
+
       <h4>Cooling First</h4>
       <ul>
         <li>Allow Orban to cool completely before packing — packing warm bread causes condensation and sogginess.</li>
