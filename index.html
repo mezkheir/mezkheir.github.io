@@ -1017,7 +1017,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     <div class="instr-section-label instr-scald">Scalding Dough (Batch 1)</div>
     <ul class="instructions-list instr-scald">
       <li><div class="step-num">1</div><span>Determine batch size — see the liturgy day selector above for reference amounts.</span></li>
-      <li><div class="step-num">2</div><span>Prepare the <strong>Scald</strong> using the 40% scald ratio amounts shown in the calculator.</span></li>
+      <li><div class="step-num">2</div><span>Prepare the <strong>Scald</strong> using the scald ratio amounts shown in the calculator (default 40% — adjustable in Settings).</span></li>
       <li><div class="step-num">3</div><span>Use <strong>boiling water</strong> for the scald. Mix for at least <strong>15–20 minutes</strong>.</span></li>
       <li><div class="step-num">4</div><span>Cool the scald — it must be <strong>fully and thoroughly cooled</strong> before continuing. Do not rush this step; incomplete cooling will ruin the batch.<br><em>Tip: point a fan at the mixer bowl and periodically run the mixer to move the dough and ensure even cooling.</em></span></li>
     </ul>
@@ -1265,6 +1265,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
           <label>Yeast (g per kg flour)</label>
           <input type="number" id="s-yeast" aria-label="Yeast grams per kg flour" value="4" min="0.1" max="20" step="0.1">
         </div>
+        <div class="settings-row">
+          <label>Scald Dough %</label>
+          <input type="number" id="s-scald" aria-label="Scald dough percentage" value="40" min="10" max="70" step="1">
+        </div>
       </div>
 
       <div class="instr-section-label" style="margin-top:1rem;">Liturgy Defaults</div>
@@ -1388,6 +1392,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   function applySettings() {
 
     state.yeastPerKgFlour  = parseFloat(document.getElementById('s-yeast').value)   || 4;
+    state.scald            = (parseFloat(document.getElementById('s-scald').value) || 40) / 100;
 
     LITURGY.tuesday.flour  = parseFloat(document.getElementById('s-tue-flour').value)  || 3;
     LITURGY.tuesday.min    = parseInt(document.getElementById('s-tue-loaves').value)   || 12;
@@ -1412,7 +1417,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     autoCalculate();
   }
 
-  ['s-yeast',
+  ['s-yeast','s-scald',
    's-tue-flour','s-tue-loaves','s-tue-size',
    's-thu-flour','s-thu-loaves','s-thu-size',
    's-sat-flour','s-sat-loaves','s-sat-size',
@@ -1661,7 +1666,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     document.getElementById('tot-dough').textContent = fmtKg(totalDough_kg);
 
     document.getElementById('results-summary').textContent =
-      `${fmtKg(flourRef_kg)} dry flour · ${state.yeastPerKgFlour} g yeast/kg · 40% scald`;
+      `${fmtKg(flourRef_kg)} dry flour · ${state.yeastPerKgFlour} g yeast/kg · ${Math.round(state.scald * 100)}% scald`;
 
     // Loaf table
     const recSizes = (!isScaldOnly && selectedDays.size === 1)
