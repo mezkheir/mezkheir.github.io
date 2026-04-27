@@ -1729,6 +1729,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       document.getElementById('tab-' + tab).classList.add('active');
       updateHomeIcon();
       if (tab === 'home') autoCalculate();
+      if (tab === 'inventory' && typeof invUpdate === 'function') invUpdate();
     });
   });
   updateHomeIcon(); // set initial state
@@ -2634,11 +2635,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     invUpdate();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', invLoad);
-  } else {
-    invLoad();
-  }
+  // Always run on DOMContentLoaded regardless of current readyState
+  document.addEventListener('DOMContentLoaded', invLoad);
+  // Also call immediately in case DOM is already ready
+  if (document.readyState !== 'loading') invLoad();
 </script>
 
 <!-- Floating Timer Bar -->
