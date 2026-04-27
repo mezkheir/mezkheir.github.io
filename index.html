@@ -1508,11 +1508,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         <span class="inv-brand">Creative Baker</span>
         <span class="inv-sub">20 kg bags</span>
       </div>
-      <div class="inv-input-wrap">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-cb20',-1)">−</button>
-        <input type="number" id="inv-cb20" class="inv-count" value="5" min="0" step="1" oninput="invUpdate()">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-cb20',1)">+</button>
-      </div>
+      <input type="number" id="inv-cb20" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
     </div>
 
     <div class="inv-row">
@@ -1520,26 +1516,18 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         <span class="inv-brand">Creative Baker</span>
         <span class="inv-sub">10 kg bags</span>
       </div>
-      <div class="inv-input-wrap">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-cb10',-1)">−</button>
-        <input type="number" id="inv-cb10" class="inv-count" value="5" min="0" step="1" oninput="invUpdate()">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-cb10',1)">+</button>
-      </div>
+      <input type="number" id="inv-cb10" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
     </div>
 
     <div class="inv-row" style="align-items:flex-start;padding-bottom:0.75rem;">
       <div class="inv-label" style="padding-top:0.3rem;">
-        <input type="text" id="inv-other-name" value="Other Brand"
+        <input type="text" id="inv-other-name" value="Five Rose"
           style="font-size:0.9rem;font-weight:600;color:var(--text-dark);background:transparent;border:none;border-bottom:1.5px dashed var(--cream-border);outline:none;width:9rem;padding:0 0 0.1rem;"
           placeholder="Brand name" oninput="invUpdate()">
         <span class="inv-sub">bags</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;">
-        <div class="inv-input-wrap">
-          <button type="button" class="inv-stepper" onclick="invStep('inv-other-count',-1)">−</button>
-          <input type="number" id="inv-other-count" class="inv-count" value="5" min="0" step="1" oninput="invUpdate()">
-          <button type="button" class="inv-stepper" onclick="invStep('inv-other-count',1)">+</button>
-        </div>
+        <input type="number" id="inv-other-count" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
         <div style="display:flex;align-items:center;gap:0.4rem;">
           <span style="font-size:0.75rem;color:var(--text-light);">kg / bag</span>
           <input type="number" id="inv-other-kg" class="inv-count" value="10" min="1" step="1" style="width:3.5rem;" oninput="invUpdate()">
@@ -1562,11 +1550,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         <span class="inv-brand">Yeast</span>
         <span class="inv-sub">boxes</span>
       </div>
-      <div class="inv-input-wrap">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-yeast',-1)">−</button>
-        <input type="number" id="inv-yeast" class="inv-count" value="5" min="0" step="1" oninput="invUpdate()">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-yeast',1)">+</button>
-      </div>
+      <input type="number" id="inv-yeast" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
     </div>
 
     <div class="inv-row">
@@ -1574,11 +1558,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         <span class="inv-brand">Scalding Dough</span>
         <span class="inv-sub">kg remaining</span>
       </div>
-      <div class="inv-input-wrap">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-scald',-0.5)">−</button>
-        <input type="number" id="inv-scald" class="inv-count" value="5" min="0" step="0.5" oninput="invUpdate()">
-        <button type="button" class="inv-stepper" onclick="invStep('inv-scald',0.5)">+</button>
-      </div>
+      <input type="number" id="inv-scald" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="30" min="0" step="0.5" oninput="invUpdate()">
     </div>
   </div>
 
@@ -2571,7 +2551,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const cb10      = invGet('inv-cb10');
     const other     = invGet('inv-other-count');
     const otherKg   = invGet('inv-other-kg') || 10;
-    const otherName = invStr('inv-other-name', 'Other Brand');
+    const otherName = invStr('inv-other-name', 'Five Rose');
     const yeast     = invGet('inv-yeast');
     const scald     = invGet('inv-scald');
     const notes     = (document.getElementById('inv-notes') || {}).value || '';
@@ -2616,7 +2596,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const cb10      = invGet('inv-cb10');
     const other     = invGet('inv-other-count');
     const otherKg   = invGet('inv-other-kg') || 10;
-    const otherName = invStr('inv-other-name', 'Other Brand');
+    const otherName = invStr('inv-other-name', 'Five Rose');
     const yeast     = invGet('inv-yeast');
     const scald     = invGet('inv-scald');
     const notes     = (document.getElementById('inv-notes') || {}).value || '';
@@ -2655,7 +2635,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       set('inv-cb10',        d.cb10);
       set('inv-other-count', d.other);
       set('inv-other-kg',    d.otherKg  != null ? d.otherKg  : 10);
-      set('inv-other-name',  d.otherName || 'Other Brand');
+      set('inv-other-name',  d.otherName || 'Five Rose');
       set('inv-yeast',       d.yeast);
       set('inv-scald',       d.scald);
       const notesEl = document.getElementById('inv-notes');
