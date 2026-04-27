@@ -886,25 +886,14 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     [data-theme="dark"] .swatch-label { color: var(--text-dark); }
 
     /* ── Checklist Mode ── */
-    #instr-card.checklist-mode li { cursor:pointer; -webkit-user-select:none; user-select:none; }
-    #instr-card.checklist-mode li:active { opacity:0.75; }
-    #instr-card.checklist-mode li.done .step-num { background:#2e7d4f !important; color:#fff !important; }
-    #instr-card.checklist-mode li.done .step-body { opacity:0.42; }
-    #instr-card.checklist-mode li.done .step-body > span:first-child { text-decoration:line-through; }
     .step-body { flex:1; min-width:0; }
-    .checklist-badge { display:none; font-size:0.75rem; color:var(--amber); font-weight:700; }
-    #instr-card.checklist-mode .checklist-badge { display:inline; }
-    .checklist-toggle-btn {
       display:flex; align-items:center; gap:0.3rem;
       background:var(--cream-light); border:1.5px solid var(--cream-border);
       border-radius:16px; padding:0.3rem 0.7rem; font-size:0.78rem; font-weight:700;
       color:var(--text-mid); cursor:pointer; white-space:nowrap;
     }
-    #instr-card.checklist-mode .checklist-toggle-btn {
       background:var(--amber); border-color:var(--amber); color:#fff;
     }
-    #checklist-reset { display:none; }
-    #instr-card.checklist-mode #checklist-reset { display:inline; }
 
     /* ── Timer Buttons ── */
     .timer-btns { display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.45rem; align-items:center; }
@@ -1149,17 +1138,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   <!-- Instructions -->
   <div class="card" id="instr-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;flex-wrap:wrap;gap:0.4rem;">
-      <div class="card-title" style="margin:0;">Step-by-Step Instructions</div>
-      <div style="display:flex;align-items:center;gap:0.5rem;">
-        <span id="checklist-progress" class="checklist-badge"></span>
-        <button id="checklist-reset" onclick="resetChecklist()" style="background:none;border:none;color:var(--text-light);font-size:0.75rem;cursor:pointer;padding:0.2rem 0.4rem;">↺ Reset</button>
-        <button class="checklist-toggle-btn" onclick="toggleChecklistMode()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          Checklist
-        </button>
-      </div>
-    </div>
+    <div class="card-title">Step-by-Step Instructions</div>
 
     <div class="instr-section-label instr-bread">Preparation</div>
     <ul class="instructions-list instr-bread">
@@ -1178,7 +1157,12 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
           <button class="timer-btn" onclick="startTimer('Scald Mix',1200,this);event.stopPropagation()">▶ 20 min</button>
         </div>
       </div></li>
-      <li data-step="5"><div class="step-num">4</div><div class="step-body"><span>Cool the scald — it must be <strong>fully and thoroughly cooled</strong> before continuing. Do not rush this step; incomplete cooling will ruin the batch.<br><em>Tip: point a fan at the mixer bowl and periodically run the mixer to move the dough and ensure even cooling.</em></span></div></li>
+      <li data-step="5"><div class="step-num">4</div><div class="step-body"><span>Cool the scald — it must be <strong>fully and thoroughly cooled</strong> before continuing. Do not rush this step; incomplete cooling will ruin the batch.<br><em>Tip: point a fan at the mixer bowl and periodically run the mixer to move the dough and ensure even cooling.</em></span>
+        <div class="timer-btns">
+          <button class="timer-btn" onclick="startTimer('Scald Cool',2700,this);event.stopPropagation()">▶ 45 min</button>
+          <button class="timer-btn" onclick="startTimer('Scald Cool',3600,this);event.stopPropagation()">▶ 60 min</button>
+        </div>
+      </div></li>
     </ul>
 
     <div class="instr-section-label instr-bread">Orban Dough (Batch 2)</div>
@@ -2265,133 +2249,6 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   // ══════════════════════════════════════════════════════
   // ── Checklist Mode (JS-driven, no CSS-var dependency) ──
   // ══════════════════════════════════════════════════════
-  let checklistMode = false;
-
-  // Event delegation on #instr-card — most reliable for iOS Safari.
-  // Clicks bubble from any child (span, div, etc.) up to the card; we then walk
-  // up to find the nearest li[data-step] ourselves.
-  function _instrCardClick(e) {
-    if (!checklistMode) return;
-    // Ignore taps on timer buttons / checklist toolbar
-    if (e.target.closest('.timer-btn, .timer-btns, .checklist-toggle-btn, #checklist-reset')) return;
-    const li = e.target.closest('li[data-step]');
-    if (!li) return;
-    li.classList.toggle('done');
-    const isDone   = li.classList.contains('done');
-    const stepNum  = li.querySelector('.step-num');
-    const stepBody = li.querySelector('.step-body');
-    const span     = li.querySelector('.step-body > span');
-    if (isDone) {
-      if (stepNum)  { stepNum.style.background = '#2e7d4f'; stepNum.style.color = '#fff'; }
-      if (stepBody)   stepBody.style.opacity = '0.45';
-      if (span)       span.style.textDecoration = 'line-through';
-    } else {
-      if (stepNum)  { stepNum.style.background = ''; stepNum.style.color = ''; }
-      if (stepBody)   stepBody.style.opacity = '';
-      if (span)       span.style.textDecoration = '';
-    }
-    updateChecklistProgress();
-  }
-
-  // Also handle touchend so fast taps on iOS aren't swallowed.
-  // We track the touch start position; if the finger barely moved it's a tap.
-  let _touchStartY = 0;
-  function _instrCardTouchStart(e) { _touchStartY = e.touches[0].clientY; }
-  function _instrCardTouchEnd(e) {
-    if (!checklistMode) return;
-    if (Math.abs(e.changedTouches[0].clientY - _touchStartY) > 10) return; // scroll, not tap
-    if (e.target.closest('.timer-btn, .timer-btns, .checklist-toggle-btn, #checklist-reset')) return;
-    const li = e.target.closest('li[data-step]');
-    if (!li) return;
-    e.preventDefault(); // prevent the 300ms delayed click from also firing
-    li.classList.toggle('done');
-    const isDone   = li.classList.contains('done');
-    const stepNum  = li.querySelector('.step-num');
-    const stepBody = li.querySelector('.step-body');
-    const span     = li.querySelector('.step-body > span');
-    if (isDone) {
-      if (stepNum)  { stepNum.style.background = '#2e7d4f'; stepNum.style.color = '#fff'; }
-      if (stepBody)   stepBody.style.opacity = '0.45';
-      if (span)       span.style.textDecoration = 'line-through';
-    } else {
-      if (stepNum)  { stepNum.style.background = ''; stepNum.style.color = ''; }
-      if (stepBody)   stepBody.style.opacity = '';
-      if (span)       span.style.textDecoration = '';
-    }
-    updateChecklistProgress();
-  }
-
-  function _wireStepListeners() {
-    const card = document.getElementById('instr-card');
-    if (!card) return;
-    // Remove any previously attached listeners before re-attaching
-    card.removeEventListener('click',      _instrCardClick);
-    card.removeEventListener('touchstart', _instrCardTouchStart);
-    card.removeEventListener('touchend',   _instrCardTouchEnd);
-    card.addEventListener('click',      _instrCardClick);
-    card.addEventListener('touchstart', _instrCardTouchStart, { passive: true });
-    card.addEventListener('touchend',   _instrCardTouchEnd,   { passive: false });
-    // Give each li cursor:pointer so iOS registers it as tappable
-    card.querySelectorAll('li[data-step]').forEach(li => {
-      li.style.cursor = 'pointer';
-      li.style.webkitTapHighlightColor = 'rgba(37,88,168,0.15)';
-    });
-  }
-
-  function toggleChecklistMode() {
-    checklistMode = !checklistMode;
-    const card = document.getElementById('instr-card');
-    const btn  = card.querySelector('.checklist-toggle-btn');
-    card.classList.toggle('checklist-mode', checklistMode);
-    if (checklistMode) {
-      btn.style.cssText = 'background:#2558A8;border-color:#2558A8;color:#fff;display:flex;align-items:center;gap:0.3rem;border-radius:16px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;cursor:pointer;border:1.5px solid #2558A8;white-space:nowrap;';
-    } else {
-      btn.style.cssText = 'background:#EDF3FB;border-color:#BDD0EA;color:#2558A8;display:flex;align-items:center;gap:0.3rem;border-radius:16px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;cursor:pointer;border:1.5px solid #BDD0EA;white-space:nowrap;';
-    }
-    updateChecklistProgress();
-  }
-
-  // Legacy shim (no remaining onclick= refs, kept for safety)
-  function checkStep(li) { if (!checklistMode) return; _instrCardClick({ target: li, preventDefault: function(){} }); }
-
-  function updateChecklistProgress() {
-    const done  = document.querySelectorAll('#instr-card li.done').length;
-    const total = document.querySelectorAll('#instr-card li[data-step]').length;
-    const el    = document.getElementById('checklist-progress');
-    if (!el) return;
-    el.textContent = done + '/' + total;
-    el.style.display = checklistMode ? 'inline' : 'none';
-    const resetBtn = document.getElementById('checklist-reset');
-    if (resetBtn) resetBtn.style.display = checklistMode ? 'inline' : 'none';
-  }
-
-  function resetChecklist() {
-    document.querySelectorAll('#instr-card li.done').forEach(li => {
-      li.classList.remove('done');
-      const stepNum  = li.querySelector('.step-num');
-      const stepBody = li.querySelector('.step-body');
-      const span     = li.querySelector('.step-body > span');
-      if (stepNum)  { stepNum.style.background = ''; stepNum.style.color = ''; }
-      if (stepBody)   stepBody.style.opacity = '';
-      if (span)       span.style.textDecoration = '';
-    });
-    updateChecklistProgress();
-  }
-
-  // Initialise button style and wire step listeners on load
-  window.addEventListener('DOMContentLoaded', () => {
-    const card = document.getElementById('instr-card');
-    if (!card) return;
-    const btn = card.querySelector('.checklist-toggle-btn');
-    if (btn) btn.style.cssText = 'background:#EDF3FB;border:1.5px solid #BDD0EA;color:#2558A8;display:flex;align-items:center;gap:0.3rem;border-radius:16px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;';
-    const resetBtn = document.getElementById('checklist-reset');
-    if (resetBtn) resetBtn.style.display = 'none';
-    const progress = document.getElementById('checklist-progress');
-    if (progress) progress.style.display = 'none';
-    // Wire all step <li> click listeners (works in all iOS Safari modes)
-    _wireStepListeners();
-  });
-
   // ══════════════════════════════════════════════════════
   // ── Timer Engine ──
   // ══════════════════════════════════════════════════════
