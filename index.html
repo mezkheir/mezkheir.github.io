@@ -2267,12 +2267,43 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   // ══════════════════════════════════════════════════════
   let checklistMode = false;
 
-  // Wire step clicks via addEventListener (more reliable than onclick= on <li> in iOS Safari)
-  function _checkStepHandler(e) {
-    // Don't fire if tapping a timer button inside the step
-    if (e.target.closest('.timer-btn, .timer-btns')) return;
+  // Event delegation on #instr-card — most reliable for iOS Safari.
+  // Clicks bubble from any child (span, div, etc.) up to the card; we then walk
+  // up to find the nearest li[data-step] ourselves.
+  function _instrCardClick(e) {
     if (!checklistMode) return;
-    const li = e.currentTarget;
+    // Ignore taps on timer buttons / checklist toolbar
+    if (e.target.closest('.timer-btn, .timer-btns, .checklist-toggle-btn, #checklist-reset')) return;
+    const li = e.target.closest('li[data-step]');
+    if (!li) return;
+    li.classList.toggle('done');
+    const isDone   = li.classList.contains('done');
+    const stepNum  = li.querySelector('.step-num');
+    const stepBody = li.querySelector('.step-body');
+    const span     = li.querySelector('.step-body > span');
+    if (isDone) {
+      if (stepNum)  { stepNum.style.background = '#2e7d4f'; stepNum.style.color = '#fff'; }
+      if (stepBody)   stepBody.style.opacity = '0.45';
+      if (span)       span.style.textDecoration = 'line-through';
+    } else {
+      if (stepNum)  { stepNum.style.background = ''; stepNum.style.color = ''; }
+      if (stepBody)   stepBody.style.opacity = '';
+      if (span)       span.style.textDecoration = '';
+    }
+    updateChecklistProgress();
+  }
+
+  // Also handle touchend so fast taps on iOS aren't swallowed.
+  // We track the touch start position; if the finger barely moved it's a tap.
+  let _touchStartY = 0;
+  function _instrCardTouchStart(e) { _touchStartY = e.touches[0].clientY; }
+  function _instrCardTouchEnd(e) {
+    if (!checklistMode) return;
+    if (Math.abs(e.changedTouches[0].clientY - _touchStartY) > 10) return; // scroll, not tap
+    if (e.target.closest('.timer-btn, .timer-btns, .checklist-toggle-btn, #checklist-reset')) return;
+    const li = e.target.closest('li[data-step]');
+    if (!li) return;
+    e.preventDefault(); // prevent the 300ms delayed click from also firing
     li.classList.toggle('done');
     const isDone   = li.classList.contains('done');
     const stepNum  = li.querySelector('.step-num');
@@ -2291,12 +2322,19 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   }
 
   function _wireStepListeners() {
-    document.querySelectorAll('#instr-card li[data-step]').forEach(li => {
-      li.removeEventListener('click', _checkStepHandler);
-      li.addEventListener('click', _checkStepHandler);
-      // iOS Safari requires cursor:pointer on non-interactive elements to fire clicks
+    const card = document.getElementById('instr-card');
+    if (!card) return;
+    // Remove any previously attached listeners before re-attaching
+    card.removeEventListener('click',      _instrCardClick);
+    card.removeEventListener('touchstart', _instrCardTouchStart);
+    card.removeEventListener('touchend',   _instrCardTouchEnd);
+    card.addEventListener('click',      _instrCardClick);
+    card.addEventListener('touchstart', _instrCardTouchStart, { passive: true });
+    card.addEventListener('touchend',   _instrCardTouchEnd,   { passive: false });
+    // Give each li cursor:pointer so iOS registers it as tappable
+    card.querySelectorAll('li[data-step]').forEach(li => {
       li.style.cursor = 'pointer';
-      li.style.webkitTapHighlightColor = 'transparent';
+      li.style.webkitTapHighlightColor = 'rgba(37,88,168,0.15)';
     });
   }
 
@@ -2313,8 +2351,8 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     updateChecklistProgress();
   }
 
-  // Legacy: keep checkStep callable from any remaining references
-  function checkStep(li) { _checkStepHandler({ currentTarget: li, target: li }); }
+  // Legacy shim (no remaining onclick= refs, kept for safety)
+  function checkStep(li) { if (!checklistMode) return; _instrCardClick({ target: li, preventDefault: function(){} }); }
 
   function updateChecklistProgress() {
     const done  = document.querySelectorAll('#instr-card li.done').length;
