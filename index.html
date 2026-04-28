@@ -1041,10 +1041,99 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       footer { margin-left: 0; }
     }
 
+    /* ── Install Banner ── */
+    #install-banner {
+      position: fixed; bottom: 70px; left: 0; right: 0; z-index: 300;
+      margin: 0 0.75rem;
+      background: var(--brown-dark);
+      color: #fff;
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: banner-slide 0.3s ease;
+    }
+    #install-banner.hidden { display: none; }
+    @keyframes banner-slide {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .install-banner-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .install-banner-body { flex: 1; }
+    .install-banner-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.2rem; }
+    .install-banner-text  { font-size: 0.8rem; opacity: 0.85; line-height: 1.4; }
+    .install-banner-share {
+      display: inline-block; background: rgba(255,255,255,0.18);
+      border-radius: 6px; padding: 0.05rem 0.35rem; font-size: 0.78rem;
+      vertical-align: middle;
+    }
+    .install-banner-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+    .install-banner-btn {
+      border: none; border-radius: 20px; padding: 0.3rem 0.8rem;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+    .install-banner-btn.primary { background: #fff; color: var(--brown-dark); }
+    .install-banner-btn.secondary { background: rgba(255,255,255,0.18); color: #fff; }
+    /* On desktop, offset by sidebar */
+    @media (min-width: 768px) {
+      #install-banner { bottom: 1rem; left: 190px; right: 1rem; max-width: 480px; }
+    }
+
+    /* ── Print styles ── */
+    @media print {
+      body { padding: 0 !important; background: #fff !important; }
+      header, .bottom-nav, #install-banner, #timer-bar, #timer-toast,
+      #ptr-indicator, .note-banner, #history-section,
+      #batch-notes-card, #loaf-table-card,
+      #tab-faq, #tab-inventory, #tab-settings,
+      .mode-selector, .liturgy-selector-card, .override-card,
+      .print-hide { display: none !important; }
+      #tab-home, #tab-home main { display: block !important; padding: 0 !important; }
+      .tab-panel { display: none !important; }
+      #tab-home { display: block !important; }
+      #results { display: block !important; }
+      #mixer-batches-card, #totals-card { display: block !important; }
+      .instr-collapsed .instr-body { display: block !important; }
+      .card { box-shadow: none !important; border: 1px solid #ddd !important; margin-bottom: 0.75rem !important; }
+      .totals-card { background: #f5f7fa !important; color: #1A3A6B !important; }
+      .t-value { color: #1A3A6B !important; }
+      .instr-toggle-row .instr-chevron { display: none !important; }
+      #instr-card { display: block !important; }
+      .print-header {
+        display: block !important;
+        text-align: center; margin-bottom: 1rem; padding-bottom: 0.75rem;
+        border-bottom: 2px solid #1A3A6B;
+      }
+      .print-header h1 { font-size: 1.3rem; color: #1A3A6B; margin: 0 0 0.2rem; }
+      .print-header p  { font-size: 0.85rem; color: #555; margin: 0; }
+    }
+
   </style>
 </head>
 <body>
 <div id="ptr-indicator"><div class="ptr-spinner"></div></div>
+
+<!-- Install Banner -->
+<div id="install-banner" class="hidden">
+  <div class="install-banner-icon">📲</div>
+  <div class="install-banner-body">
+    <div class="install-banner-title">Add to your Home Screen</div>
+    <div class="install-banner-text" id="install-banner-text">
+      Tap <span class="install-banner-share">Share ⬆</span> then
+      <strong>"Add to Home Screen"</strong> for the full app experience — works offline too.
+    </div>
+    <div class="install-banner-actions">
+      <button class="install-banner-btn primary" onclick="dismissInstallBanner(true)">Got it</button>
+      <button class="install-banner-btn secondary" onclick="dismissInstallBanner(false)">Later</button>
+    </div>
+  </div>
+</div>
+
+<!-- Print-only header -->
+<div class="print-header" style="display:none;">
+  <h1>Orban Guide — Recipe Sheet</h1>
+  <p>St. Maurice &amp; St. Verena Coptic Orthodox Church</p>
+</div>
 
 <header>
   <div class="church-logo">
@@ -1148,6 +1237,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     <div class="results-header">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
         <h2 style="margin:0;">Your Recipe</h2>
+        <button onclick="window.print()" title="Print recipe" style="display:flex;align-items:center;gap:0.35rem;background:var(--card-bg);color:var(--text-mid);border:1px solid var(--cream-border);border-radius:20px;padding:0.4rem 0.85rem;font-size:0.82rem;font-weight:700;cursor:pointer;" class="print-hide">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print
+        </button>
         <button id="share-btn" onclick="shareResults()" title="Share batch via iMessage or WhatsApp" style="display:none;align-items:center;gap:0.35rem;background:var(--amber);color:#fff;border:none;border-radius:20px;padding:0.4rem 0.85rem;font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.02em;">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           Share
@@ -2538,6 +2631,50 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+</script>
+
+<script>
+  // ── Install Banner ────────────────────────────────────────────────────────
+  const INSTALL_KEY = 'orban-install-dismissed';
+  let _deferredPrompt = null;
+
+  // Android: capture the native install prompt
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredPrompt = e;
+    // Rewrite banner text for Android (one-tap install)
+    const t = document.getElementById('install-banner-text');
+    if (t) t.innerHTML = 'Install the app for quick access and <strong>offline use</strong> — works without internet.';
+    maybeShowInstallBanner();
+  });
+
+  function maybeShowInstallBanner() {
+    // Don't show if permanently dismissed, or already installed as PWA
+    if (localStorage.getItem(INSTALL_KEY) === 'forever') return;
+    if (window.navigator.standalone) return;               // iOS already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) return; // Android installed
+    // Small delay so it doesn't flash immediately on load
+    setTimeout(() => {
+      const banner = document.getElementById('install-banner');
+      if (banner) banner.classList.remove('hidden');
+    }, 3000);
+  }
+
+  function dismissInstallBanner(permanent) {
+    const banner = document.getElementById('install-banner');
+    if (banner) banner.classList.add('hidden');
+    if (permanent) localStorage.setItem(INSTALL_KEY, 'forever');
+    // Android: trigger native install if available
+    if (permanent && _deferredPrompt) {
+      _deferredPrompt.prompt();
+      _deferredPrompt.userChoice.then(() => { _deferredPrompt = null; });
+    }
+  }
+
+  // Show on iOS Safari (no beforeinstallprompt event)
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if (isIOS && isSafari) maybeShowInstallBanner();
 </script>
 
 <script>
