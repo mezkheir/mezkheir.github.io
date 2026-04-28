@@ -2025,7 +2025,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         `<tr><td>${d.label}</td><td>${d.flour} kg</td><td>${scaldWt(d.flour)} kg</td></tr>`
       ).join('');
       const totalRow = rows.length > 1
-        ? `<tr style="font-weight:700;border-top:2px solid var(--cream-border);"><td>Total</td><td>${totalFlour} kg</td><td>${totalScald.toFixed(2)} kg</td></tr>`
+        ? `<tr style="font-weight:700;border-top:2px solid var(--cream-border);"><td>Total</td><td>${totalFlour} kg</td><td>${fmtN(totalScald,2)} kg</td></tr>`
         : '';
       inner.innerHTML = `
         <table class="scald-ref-table">
@@ -2123,8 +2123,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   // Ceiling rounded to nearest 0.05 (matches spreadsheet CEILING formula)
   function ceilTo005(x) { return Math.ceil(x / 0.05) * 0.05; }
 
-  function fmtKg(kg) { return kg >= 1 ? kg.toFixed(2) + ' kg' : (kg * 1000).toFixed(0) + ' g'; }
-  function fmtL(L)   { return L  >= 1 ? L.toFixed(2)  + ' L'  : (L  * 1000).toFixed(0) + ' mL'; }
+  // Strip trailing zeros: fmtN(4.00,2)→'4'  fmtN(4.40,2)→'4.4'  fmtN(4.44,2)→'4.44'
+  function fmtN(n, dp=2) { return parseFloat(n.toFixed(dp)).toString(); }
+  function fmtKg(kg) { return kg >= 1 ? fmtN(kg,2) + ' kg' : (kg*1000).toFixed(0) + ' g'; }
+  function fmtL(L)   { return L  >= 1 ? fmtN(L,2)  + ' L'  : (L*1000).toFixed(0)  + ' mL'; }
   function fmtG(g)   { return Math.ceil(g) + ' g'; }
 
   function calculate(flourKg) {
@@ -2326,9 +2328,9 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       `📅 ${c.date}`,
       `⛪ ${c.days}`,
       '',
-      `Dry Flour: ${c.flour >= 1 ? c.flour.toFixed(2) + ' kg' : (c.flour * 1000).toFixed(0) + ' g'}`,
-      `Total Water: ${c.totalWater >= 1 ? c.totalWater.toFixed(2) + ' L' : (c.totalWater * 1000).toFixed(0) + ' mL'}`,
-      `Dough Weight: ${c.totalDough >= 1 ? c.totalDough.toFixed(2) + ' kg' : (c.totalDough * 1000).toFixed(0) + ' g'}`,
+      `Dry Flour: ${c.flour >= 1 ? fmtN(c.flour,2) + ' kg' : (c.flour * 1000).toFixed(0) + ' g'}`,
+      `Total Water: ${c.totalWater >= 1 ? fmtN(c.totalWater,2) + ' L' : (c.totalWater * 1000).toFixed(0) + ' mL'}`,
+      `Dough Weight: ${c.totalDough >= 1 ? fmtN(c.totalDough,2) + ' kg' : (c.totalDough * 1000).toFixed(0) + ' g'}`,
       `Yeast: ${Math.ceil(c.yeastG)} g`,
       `Scald: ${Math.round(c.scald * 100)}%`,
       notes ? '' : null,
@@ -2580,7 +2582,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const totalFlour = (cb20 * cb20Kg) + (cb10 * cb10Kg) + (other * otherKg);
     const flourEl = document.getElementById('inv-flour-total');
     const weeksEst = (totalFlour / 45).toFixed(1);
-    if (flourEl) flourEl.textContent = totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks)';
+    if (flourEl) flourEl.textContent = fmtN(totalFlour,1) + ' kg  (' + fmtN(totalFlour/45,1) + ' wks)';
 
     const parts = [];
     if (cb20  > 0) parts.push(cb20  + ' × ' + mainBrand + ', ' + cb20Kg + ' kg/bag = ' + (cb20 * cb20Kg) + ' kg');
@@ -2591,7 +2593,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     if (sumEl) {
       const flourHtml = parts.length
         ? parts.map(p => '&bull; ' + p).join('<br>') +
-          '<br><strong>Total: ' + totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks @ 45 kg/week)</strong>'
+          '<br><strong>Total: ' + fmtN(totalFlour,1) + ' kg  (' + fmtN(totalFlour/45,1) + ' wks @ 45 kg/week)</strong>'
         : '&bull; No flour recorded';
       sumEl.innerHTML =
         '<strong style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.06em;opacity:0.7;">Flour</strong><br>' +
@@ -2635,7 +2637,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     if (cb10  > 0) lines.push('  • ' + brand2    + ', ' + cb10Kg + ' kg/bag: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10 * cb10Kg) + ' kg)');
     if (other > 0) lines.push('  • ' + otherName + ' (' + otherKg + ' kg): ' + other + ' bag' + (other !== 1 ? 's' : '') + ' (' + (other * otherKg) + ' kg)');
     const weeksEst = (totalFlour / 45).toFixed(1);
-    lines.push('  Total: ' + totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks @ 45 kg/week)');
+    lines.push('  Total: ' + fmtN(totalFlour,1) + ' kg  (' + fmtN(totalFlour/45,1) + ' wks @ 45 kg/week)');
     lines.push('', '📦 Other Stock');
     lines.push('  • Yeast: ' + yeast + ' box' + (yeast !== 1 ? 'es' : ''));
     lines.push('  • Scalding Dough: ' + scald + ' kg');
