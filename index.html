@@ -1501,20 +1501,23 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   <!-- Flour Stock -->
   <div class="card">
-    <div class="card-title">🌾 Flour Stock</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+      <div class="card-title" style="margin:0;">🌾 Flour Stock</div>
+      <input type="text" id="inv-main-brand" value="Creative Baker"
+        style="font-size:0.85rem;font-weight:600;color:var(--text-dark);background:transparent;border:none;border-bottom:1.5px dashed var(--cream-border);outline:none;width:9rem;text-align:right;padding:0 0 0.1rem;"
+        placeholder="Brand name" oninput="invUpdate()">
+    </div>
 
     <div class="inv-row">
       <div class="inv-label">
-        <span class="inv-brand">Creative Baker</span>
-        <span class="inv-sub">20 kg bags</span>
+        <span class="inv-brand">20 kg bags</span>
       </div>
       <input type="number" id="inv-cb20" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
     </div>
 
     <div class="inv-row">
       <div class="inv-label">
-        <span class="inv-brand">Creative Baker</span>
-        <span class="inv-sub">10 kg bags</span>
+        <span class="inv-brand">10 kg bags</span>
       </div>
       <input type="number" id="inv-cb10" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
     </div>
@@ -2480,6 +2483,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const other     = invGet('inv-other-count');
     const otherKg   = invGet('inv-other-kg') || 10;
     const otherName = invStr('inv-other-name', 'Five Rose');
+    const mainBrand = invStr('inv-main-brand', 'Creative Baker');
     const yeast     = invGet('inv-yeast');
     const scald     = invGet('inv-scald');
     const notes     = (document.getElementById('inv-notes') || {}).value || '';
@@ -2489,8 +2493,8 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     if (flourEl) flourEl.textContent = totalFlour.toFixed(1) + ' kg';
 
     const parts = [];
-    if (cb20  > 0) parts.push(cb20  + ' × Creative Baker 20 kg = ' + (cb20 * 20)       + ' kg');
-    if (cb10  > 0) parts.push(cb10  + ' × Creative Baker 10 kg = ' + (cb10 * 10)       + ' kg');
+    if (cb20  > 0) parts.push(cb20  + ' × ' + mainBrand + ' 20 kg = ' + (cb20 * 20)       + ' kg');
+    if (cb10  > 0) parts.push(cb10  + ' × ' + mainBrand + ' 10 kg = ' + (cb10 * 10)       + ' kg');
     if (other > 0) parts.push(other + ' × ' + otherName + ' ' + otherKg + ' kg = ' + (other * otherKg) + ' kg');
 
     const sumEl = document.getElementById('inv-summary');
@@ -2512,7 +2516,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     });
     try {
       localStorage.setItem(INV_KEY, JSON.stringify({
-        cb20, cb10, other, otherKg, otherName, yeast, scald, notes, stamp
+        cb20, cb10, other, otherKg, otherName, mainBrand, yeast, scald, notes, stamp
       }));
     } catch(e) {}
     const stampEl = document.getElementById('inv-saved-stamp');
@@ -2525,6 +2529,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const other     = invGet('inv-other-count');
     const otherKg   = invGet('inv-other-kg') || 10;
     const otherName = invStr('inv-other-name', 'Five Rose');
+    const mainBrand = invStr('inv-main-brand', 'Creative Baker');
     const yeast     = invGet('inv-yeast');
     const scald     = invGet('inv-scald');
     const notes     = (document.getElementById('inv-notes') || {}).value || '';
@@ -2533,8 +2538,8 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     });
     const lines = ['📦 Orban Inventory Report', date, '', '🌾 Flour Stock'];
-    if (cb20  > 0) lines.push('  • Creative Baker 20 kg: ' + cb20  + ' bag' + (cb20  !== 1 ? 's' : '') + ' (' + (cb20  * 20) + ' kg)');
-    if (cb10  > 0) lines.push('  • Creative Baker 10 kg: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10  * 10) + ' kg)');
+    if (cb20  > 0) lines.push('  • ' + mainBrand + ' 20 kg: ' + cb20  + ' bag' + (cb20  !== 1 ? 's' : '') + ' (' + (cb20  * 20) + ' kg)');
+    if (cb10  > 0) lines.push('  • ' + mainBrand + ' 10 kg: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10  * 10) + ' kg)');
     if (other > 0) lines.push('  • ' + otherName + ' (' + otherKg + ' kg): ' + other + ' bag' + (other !== 1 ? 's' : '') + ' (' + (other * otherKg) + ' kg)');
     lines.push('  Total: ' + totalFlour.toFixed(1) + ' kg');
     lines.push('', '📦 Other Stock');
@@ -2562,7 +2567,8 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       set('inv-cb10',        d.cb10);
       set('inv-other-count', d.other);
       set('inv-other-kg',    d.otherKg  != null ? d.otherKg  : 10);
-      set('inv-other-name',  d.otherName || 'Five Rose');
+      set('inv-other-name',  d.otherName  || 'Five Rose');
+      set('inv-main-brand',  d.mainBrand  || 'Creative Baker');
       set('inv-yeast',       d.yeast);
       set('inv-scald',       d.scald);
       const notesEl = document.getElementById('inv-notes');
