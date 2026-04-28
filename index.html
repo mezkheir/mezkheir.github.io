@@ -580,6 +580,23 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     .scald-ref-table td:not(:first-child),
     .scald-ref-table th:not(:first-child) { text-align: right; font-weight: 700; color: var(--brown-dark); }
     .scald-ref-table tbody tr:last-child td { border-bottom: none; }
+    /* Inventory flour table */
+    .inv-flour-table td:nth-child(2),
+    .inv-flour-table th:nth-child(2) { text-align: right; }
+    .inv-flour-table input[type="text"],
+    .inv-flour-table input[type="number"] {
+      background: transparent; border: none;
+      border-bottom: 1.5px dashed var(--cream-border);
+      outline: none; font-family: inherit;
+      color: var(--text-dark); font-weight: 600; font-size: 0.88rem;
+      padding: 0 0 0.1rem; width: 100%;
+    }
+    .inv-flour-table input[type="number"] { text-align: right; width: 3.5rem; }
+    .inv-flour-table .inv-total-row td {
+      border-top: 1.5px solid var(--cream-border);
+      border-bottom: none; padding-top: 0.55rem;
+      font-weight: 700; color: var(--text-dark);
+    }
 
     /* ── Mixer Batch 2×2 Grid ── */
     .batch-2x2-grid {
@@ -1501,47 +1518,37 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   <!-- Flour Stock -->
   <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
-      <div class="card-title" style="margin:0;">🌾 Flour Stock</div>
-      <input type="text" id="inv-main-brand" value="Creative Baker"
-        style="font-size:0.85rem;font-weight:600;color:var(--text-dark);background:transparent;border:none;border-bottom:1.5px dashed var(--cream-border);outline:none;width:9rem;text-align:right;padding:0 0 0.1rem;"
-        placeholder="Brand name" oninput="invUpdate()">
-    </div>
-
-    <div class="inv-row">
-      <div class="inv-label">
-        <span class="inv-brand">20 kg bags</span>
-      </div>
-      <input type="number" id="inv-cb20" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
-    </div>
-
-    <div class="inv-row">
-      <div class="inv-label">
-        <span class="inv-brand">10 kg bags</span>
-      </div>
-      <input type="number" id="inv-cb10" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
-    </div>
-
-    <div class="inv-row" style="align-items:flex-start;padding-bottom:0.75rem;">
-      <div class="inv-label" style="padding-top:0.3rem;">
-        <input type="text" id="inv-other-name" value="Five Rose"
-          style="font-size:0.9rem;font-weight:600;color:var(--text-dark);background:transparent;border:none;border-bottom:1.5px dashed var(--cream-border);outline:none;width:9rem;padding:0 0 0.1rem;"
-          placeholder="Brand name" oninput="invUpdate()">
-        <span class="inv-sub">bags</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;">
-        <input type="number" id="inv-other-count" class="inv-count" style="width:5rem;border-radius:8px;border:1px solid var(--cream-border);text-align:center;" value="5" min="0" step="1" oninput="invUpdate()">
-        <div style="display:flex;align-items:center;gap:0.4rem;">
-          <span style="font-size:0.75rem;color:var(--text-light);">kg / bag</span>
-          <input type="number" id="inv-other-kg" class="inv-count" value="10" min="1" step="1" style="width:3.5rem;" oninput="invUpdate()">
-        </div>
-      </div>
-    </div>
-
-    <div class="inv-total-row">
-      <span>Total Flour</span>
-      <span id="inv-flour-total" class="inv-total-val">—</span>
-    </div>
+    <div class="card-title">🌾 Flour Stock</div>
+    <table class="scald-ref-table inv-flour-table">
+      <thead>
+        <tr>
+          <th>Brand</th>
+          <th>Kg / bag</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" id="inv-main-brand" value="Creative Baker" placeholder="Brand" oninput="invSyncBrand();invUpdate()"></td>
+          <td style="text-align:right;font-weight:700;color:var(--brown-dark);">20</td>
+          <td><input type="number" id="inv-cb20" value="5" min="0" step="1" oninput="invUpdate()"></td>
+        </tr>
+        <tr>
+          <td><span id="inv-brand-row2" style="color:var(--text-light);font-size:0.85rem;">Creative Baker</span></td>
+          <td style="text-align:right;font-weight:700;color:var(--brown-dark);">10</td>
+          <td><input type="number" id="inv-cb10" value="5" min="0" step="1" oninput="invUpdate()"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="inv-other-name" value="Five Rose" placeholder="Brand" oninput="invUpdate()"></td>
+          <td><input type="number" id="inv-other-kg" value="10" min="1" step="1" oninput="invUpdate()"></td>
+          <td><input type="number" id="inv-other-count" value="5" min="0" step="1" oninput="invUpdate()"></td>
+        </tr>
+        <tr class="inv-total-row">
+          <td colspan="2">Total Flour</td>
+          <td id="inv-flour-total" style="text-align:right;">—</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- Other Stock -->
@@ -2470,6 +2477,12 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     return (el && el.value.trim()) ? el.value.trim() : fallback;
   }
 
+
+  function invSyncBrand() {
+    const el = document.getElementById('inv-brand-row2');
+    if (el) el.textContent = invStr('inv-main-brand', 'Creative Baker');
+  }
+
   function invStep(id, delta) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -2478,6 +2491,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   }
 
   function invUpdate() {
+    invSyncBrand();
     const cb20      = invGet('inv-cb20');
     const cb10      = invGet('inv-cb10');
     const other     = invGet('inv-other-count');
@@ -2574,6 +2588,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       const notesEl = document.getElementById('inv-notes');
       if (notesEl && d.notes) notesEl.value = d.notes;
     } catch(e) {}
+    invSyncBrand();
     invUpdate();
   }
 
