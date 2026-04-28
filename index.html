@@ -581,20 +581,23 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     .scald-ref-table th:not(:first-child) { text-align: right; font-weight: 700; color: var(--brown-dark); }
     .scald-ref-table tbody tr:last-child td { border-bottom: none; }
     /* Inventory flour table */
+    .inv-flour-table td { border-bottom: none; padding: 0.35rem 0; }
     .inv-flour-table td:nth-child(2),
     .inv-flour-table th:nth-child(2) { text-align: right; }
     .inv-flour-table input[type="text"],
     .inv-flour-table input[type="number"] {
-      background: transparent; border: none;
-      border-bottom: 1.5px dashed var(--cream-border);
+      background: var(--card-bg);
+      border: 1px solid var(--cream-border);
+      border-radius: 8px;
       outline: none; font-family: inherit;
       color: var(--text-dark); font-weight: 600; font-size: 0.88rem;
-      padding: 0 0 0.1rem; width: 100%;
+      padding: 0.3rem 0.5rem;
     }
-    .inv-flour-table input[type="number"] { text-align: right; width: 3.5rem; }
+    .inv-flour-table input[type="text"] { width: 100%; box-sizing: border-box; }
+    .inv-flour-table input[type="number"] { text-align: center; width: 4rem; }
     .inv-flour-table .inv-total-row td {
-      border-top: 1.5px solid var(--cream-border);
-      border-bottom: none; padding-top: 0.55rem;
+      border-top: 1px solid var(--cream-border);
+      padding-top: 0.6rem; padding-bottom: 0;
       font-weight: 700; color: var(--text-dark);
     }
 
