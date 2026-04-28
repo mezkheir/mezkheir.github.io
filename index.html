@@ -1131,6 +1131,38 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       font-size: 0.72rem; font-weight: 700; margin-top: 0.3rem;
     }
 
+    /* Feast banner reminder button */
+    .feast-remind-btn {
+      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35);
+      color: #fff; border-radius: 20px; padding: 0.3rem 0.75rem;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      margin-top: 0.4rem; display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .feast-remind-btn:active { background: rgba(255,255,255,0.35); }
+
+    /* Upcoming Feasts card table */
+    .upcoming-feast-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.5rem 0; border-bottom: 1px solid var(--cream-border);
+    }
+    .upcoming-feast-row:last-of-type { border-bottom: none; }
+    .upcoming-feast-date {
+      font-size: 0.78rem; font-weight: 700; color: var(--brown-dark);
+      min-width: 4.5rem; flex-shrink: 0;
+    }
+    .upcoming-feast-info { flex: 1; min-width: 0; }
+    .upcoming-feast-name { font-size: 0.88rem; font-weight: 600; color: var(--text-dark); }
+    .upcoming-feast-tier {
+      font-size: 0.72rem; color: var(--text-light); margin-top: 0.1rem;
+    }
+    .upcoming-remind-btn {
+      background: none; border: 1px solid var(--cream-border);
+      border-radius: 20px; padding: 0.25rem 0.6rem;
+      font-size: 0.72rem; font-weight: 700; color: var(--brown-dark);
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    }
+    .upcoming-remind-btn:active { background: var(--cream-light, #EDF3FB); }
+
   </style>
 </head>
 <body>
@@ -1179,6 +1211,21 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     <div class="feast-name" id="feast-name"></div>
     <div class="feast-sub" id="feast-sub"></div>
     <span class="feast-tag" id="feast-tag"></span>
+    <br>
+    <button class="feast-remind-btn" id="feast-remind-btn" onclick="addFeastReminder()">
+      📅 Add to Calendar
+    </button>
+  </div>
+</div>
+
+<!-- Upcoming Feasts -->
+<div class="card instr-collapsed" id="upcoming-feasts-card">
+  <div class="instr-toggle-row" onclick="this.closest('.card').classList.toggle('instr-collapsed')">
+    <div class="card-title" style="margin:0;">📅 Upcoming Feasts &amp; Long Weekends</div>
+    <span class="instr-chevron">&#9660;</span>
+  </div>
+  <div class="instr-body">
+    <div id="upcoming-feasts-list" style="margin-top:0.5rem;"></div>
   </div>
 </div>
 
@@ -2714,6 +2761,9 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     sunday:   'Sunday Liturgy quantities',
   };
 
+  // Store the current feast for the reminder button
+  let _todayFeast = null;
+
   function initFeastBanner() {
     const today = new Date();
     const pad   = n => String(n).padStart(2, '0');
@@ -2721,24 +2771,22 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const feast = FEAST_DAYS.find(f => f.d === key);
 
     if (!feast) {
-      // No feast — just auto-select by day of week
       autoSelectByDayOfWeek();
-      return;
+    } else {
+      _todayFeast = feast;
+      const banner = document.getElementById('feast-banner');
+      document.getElementById('feast-name').textContent = feast.icon + '  ' + feast.name;
+      document.getElementById('feast-sub').textContent  = 'Liturgy quantities auto-selected — override below if needed.';
+      document.getElementById('feast-tag').textContent  = LITURGY_LABELS[feast.liturgy];
+      if (banner) banner.classList.add('visible');
+      selectLiturgyKey(feast.liturgy);
     }
 
-    // Show feast banner
-    const banner = document.getElementById('feast-banner');
-    document.getElementById('feast-name').textContent = feast.icon + '  ' + feast.name;
-    document.getElementById('feast-sub').textContent  = 'Liturgy quantities auto-selected — override below if needed.';
-    document.getElementById('feast-tag').textContent  = LITURGY_LABELS[feast.liturgy];
-    if (banner) banner.classList.add('visible');
-
-    // Auto-select the liturgy
-    selectLiturgyKey(feast.liturgy);
+    renderUpcomingFeasts();
   }
 
   function autoSelectByDayOfWeek() {
-    const day = new Date().getDay(); // 0=Sun,1=Mon,...,6=Sat
+    const day = new Date().getDay();
     const map  = { 0:'sunday', 2:'tuesday', 4:'thursday', 6:'saturday' };
     const key  = map[day];
     if (key) selectLiturgyKey(key);
@@ -2746,9 +2794,80 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   function selectLiturgyKey(key) {
     const btn = document.querySelector(`.liturgy-btn[data-liturgy="${key}"]`);
-    if (!btn) return;
-    // Simulate a click so all existing selection logic runs correctly
-    btn.click();
+    if (btn) btn.click();
+  }
+
+  // ── Upcoming Feasts card — next 5 from today ─────────────────────────────
+  function renderUpcomingFeasts() {
+    const list = document.getElementById('upcoming-feasts-list');
+    if (!list) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const upcoming = FEAST_DAYS
+      .map(f => ({ ...f, dateObj: new Date(f.d + 'T00:00:00') }))
+      .filter(f => f.dateObj >= today)
+      .sort((a, b) => a.dateObj - b.dateObj)
+      .slice(0, 5);
+
+    if (!upcoming.length) { list.textContent = 'No upcoming feasts in the calendar.'; return; }
+
+    list.innerHTML = upcoming.map(f => {
+      const label = f.dateObj.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
+      const tier  = LITURGY_LABELS[f.liturgy];
+      return `<div class="upcoming-feast-row">
+        <div class="upcoming-feast-date">${label}</div>
+        <div class="upcoming-feast-info">
+          <div class="upcoming-feast-name">${f.icon} ${f.name}</div>
+          <div class="upcoming-feast-tier">${tier}</div>
+        </div>
+        <button class="upcoming-remind-btn" onclick="addReminderForFeast(${JSON.stringify(f.d)}, ${JSON.stringify(f.name)}, ${JSON.stringify(f.liturgy)})">📅 Remind</button>
+      </div>`;
+    }).join('');
+  }
+
+  // ── ICS Calendar Reminder ─────────────────────────────────────────────────
+  function buildICS(dateStr, name, liturgy) {
+    // dateStr = 'YYYY-MM-DD'
+    const icsDate = dateStr.replace(/-/g, '');       // '20250608'
+    const nextDay = dateStr.replace(/-/g, '');       // same-day event
+    const d = new Date(dateStr + 'T00:00:00');
+    const nextD = new Date(d); nextD.setDate(d.getDate() + 1);
+    const pad = n => String(n).padStart(2,'0');
+    const endDate = `${nextD.getFullYear()}${pad(nextD.getMonth()+1)}${pad(nextD.getDate())}`;
+    const desc = `${LITURGY_LABELS[liturgy]} suggested.\\nPrepare flour and ingredients accordingly.\\n— Orban Guide, St. Maurice & St. Verena`;
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Orban Guide//EN',
+      'BEGIN:VEVENT',
+      `DTSTART;VALUE=DATE:${icsDate}`,
+      `DTEND;VALUE=DATE:${endDate}`,
+      `SUMMARY:Orban Bake — ${name}`,
+      `DESCRIPTION:${desc}`,
+      'BEGIN:VALARM',
+      'TRIGGER:-P1D',          // 1 day before reminder
+      'ACTION:DISPLAY',
+      `DESCRIPTION:Orban bake tomorrow — ${name}`,
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  function addReminderForFeast(dateStr, name, liturgy) {
+    const ics  = buildICS(dateStr, name, liturgy);
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `orban-${name.replace(/[^a-z0-9]/gi,'-').toLowerCase()}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function addFeastReminder() {
+    if (_todayFeast) addReminderForFeast(_todayFeast.d, _todayFeast.name, _todayFeast.liturgy);
   }
 
   document.addEventListener('DOMContentLoaded', initFeastBanner);
