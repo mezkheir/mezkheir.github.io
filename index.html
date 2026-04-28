@@ -1532,13 +1532,13 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       </thead>
       <tbody>
         <tr>
-          <td><input type="text" id="inv-main-brand" value="Creative Baker" placeholder="Brand" oninput="invSyncBrand();invUpdate()"></td>
-          <td style="text-align:right;font-weight:700;color:var(--brown-dark);">20</td>
+          <td><input type="text" id="inv-main-brand" value="Creative Baker" placeholder="Brand" oninput="invUpdate()"></td>
+          <td><input type="number" id="inv-cb20-kg" value="20" min="1" step="1" oninput="invUpdate()"></td>
           <td><input type="number" id="inv-cb20" value="5" min="0" step="1" oninput="invUpdate()"></td>
         </tr>
         <tr>
-          <td><span id="inv-brand-row2" style="color:var(--text-light);font-size:0.85rem;">Creative Baker</span></td>
-          <td style="text-align:right;font-weight:700;color:var(--brown-dark);">10</td>
+          <td><input type="text" id="inv-main-brand2" value="Creative Baker" placeholder="Brand" oninput="invUpdate()"></td>
+          <td><input type="number" id="inv-cb10-kg" value="10" min="1" step="1" oninput="invUpdate()"></td>
           <td><input type="number" id="inv-cb10" value="5" min="0" step="1" oninput="invUpdate()"></td>
         </tr>
         <tr>
@@ -2481,11 +2481,6 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   }
 
 
-  function invSyncBrand() {
-    const el = document.getElementById('inv-brand-row2');
-    if (el) el.textContent = invStr('inv-main-brand', 'Creative Baker');
-  }
-
   function invStep(id, delta) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -2494,7 +2489,6 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   }
 
   function invUpdate() {
-    invSyncBrand();
     const cb20      = invGet('inv-cb20');
     const cb10      = invGet('inv-cb10');
     const other     = invGet('inv-other-count');
@@ -2542,21 +2536,24 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   function invShare() {
     const cb20      = invGet('inv-cb20');
+    const cb20Kg    = invGet('inv-cb20-kg') || 20;
     const cb10      = invGet('inv-cb10');
+    const cb10Kg    = invGet('inv-cb10-kg') || 10;
     const other     = invGet('inv-other-count');
     const otherKg   = invGet('inv-other-kg') || 10;
     const otherName = invStr('inv-other-name', 'Five Rose');
     const mainBrand = invStr('inv-main-brand', 'Creative Baker');
+    const brand2    = invStr('inv-main-brand2', 'Creative Baker');
     const yeast     = invGet('inv-yeast');
     const scald     = invGet('inv-scald');
     const notes     = (document.getElementById('inv-notes') || {}).value || '';
-    const totalFlour = (cb20 * 20) + (cb10 * 10) + (other * otherKg);
+    const totalFlour = (cb20 * cb20Kg) + (cb10 * cb10Kg) + (other * otherKg);
     const date = new Date().toLocaleDateString('en-AU', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     });
     const lines = ['📦 Orban Inventory Report', date, '', '🌾 Flour Stock'];
-    if (cb20  > 0) lines.push('  • ' + mainBrand + ' 20 kg: ' + cb20  + ' bag' + (cb20  !== 1 ? 's' : '') + ' (' + (cb20  * 20) + ' kg)');
-    if (cb10  > 0) lines.push('  • ' + mainBrand + ' 10 kg: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10  * 10) + ' kg)');
+    if (cb20  > 0) lines.push('  • ' + mainBrand + ', ' + cb20Kg + ' kg/bag: ' + cb20  + ' bag' + (cb20  !== 1 ? 's' : '') + ' (' + (cb20 * cb20Kg) + ' kg)');
+    if (cb10  > 0) lines.push('  • ' + brand2    + ', ' + cb10Kg + ' kg/bag: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10 * cb10Kg) + ' kg)');
     if (other > 0) lines.push('  • ' + otherName + ' (' + otherKg + ' kg): ' + other + ' bag' + (other !== 1 ? 's' : '') + ' (' + (other * otherKg) + ' kg)');
     lines.push('  Total: ' + totalFlour.toFixed(1) + ' kg');
     lines.push('', '📦 Other Stock');
@@ -2581,17 +2578,19 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       const d = JSON.parse(raw);
       const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
       set('inv-cb20',        d.cb20);
+      set('inv-cb20-kg',     d.cb20Kg   != null ? d.cb20Kg   : 20);
       set('inv-cb10',        d.cb10);
+      set('inv-cb10-kg',     d.cb10Kg   != null ? d.cb10Kg   : 10);
       set('inv-other-count', d.other);
       set('inv-other-kg',    d.otherKg  != null ? d.otherKg  : 10);
       set('inv-other-name',  d.otherName  || 'Five Rose');
       set('inv-main-brand',  d.mainBrand  || 'Creative Baker');
+      set('inv-main-brand2', d.brand2     || 'Creative Baker');
       set('inv-yeast',       d.yeast);
       set('inv-scald',       d.scald);
       const notesEl = document.getElementById('inv-notes');
       if (notesEl && d.notes) notesEl.value = d.notes;
     } catch(e) {}
-    invSyncBrand();
     invUpdate();
   }
 
