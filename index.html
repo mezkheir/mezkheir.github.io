@@ -2501,7 +2501,8 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
     const totalFlour = (cb20 * 20) + (cb10 * 10) + (other * otherKg);
     const flourEl = document.getElementById('inv-flour-total');
-    if (flourEl) flourEl.textContent = totalFlour.toFixed(1) + ' kg';
+    const weeksEst = (totalFlour / 45).toFixed(1);
+    if (flourEl) flourEl.textContent = totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks)';
 
     const parts = [];
     if (cb20  > 0) parts.push(cb20  + ' × ' + mainBrand + ' 20 kg = ' + (cb20 * 20)       + ' kg');
