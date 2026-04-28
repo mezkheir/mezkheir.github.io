@@ -1119,24 +1119,29 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     </div>
 
     <!-- Totals -->
-    <div class="card totals-card" id="totals-card">
-      <div class="card-title">Totals</div>
-      <div class="totals-grid">
-        <div class="total-item">
-          <div class="t-value" id="tot-flour">—</div>
-          <div class="t-label">Total Flour</div>
-        </div>
-        <div class="total-item">
-          <div class="t-value" id="tot-water">—</div>
-          <div class="t-label">Total Water</div>
-        </div>
-        <div class="total-item">
-          <div class="t-value" id="tot-dough">—</div>
-          <div class="t-label">Dough Weight</div>
-        </div>
-        <div class="total-item">
-          <div class="t-value" id="tot-yeast">—</div>
-          <div class="t-label">Yeast</div>
+    <div class="card totals-card instr-collapsed" id="totals-card">
+      <div class="instr-toggle-row" onclick="this.closest('.card').classList.toggle('instr-collapsed')">
+        <div class="card-title" style="margin:0;">Totals</div>
+        <span class="instr-chevron">&#9660;</span>
+      </div>
+      <div class="instr-body">
+        <div class="totals-grid">
+          <div class="total-item">
+            <div class="t-value" id="tot-flour">—</div>
+            <div class="t-label">Total Flour</div>
+          </div>
+          <div class="total-item">
+            <div class="t-value" id="tot-water">—</div>
+            <div class="t-label">Total Water</div>
+          </div>
+          <div class="total-item">
+            <div class="t-value" id="tot-dough">—</div>
+            <div class="t-label">Dough Weight</div>
+          </div>
+          <div class="total-item">
+            <div class="t-value" id="tot-yeast">—</div>
+            <div class="t-label">Yeast</div>
+          </div>
         </div>
       </div>
     </div>
