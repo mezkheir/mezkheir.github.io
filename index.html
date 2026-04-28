@@ -2499,21 +2499,24 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const scald     = invGet('inv-scald');
     const notes     = (document.getElementById('inv-notes') || {}).value || '';
 
-    const totalFlour = (cb20 * 20) + (cb10 * 10) + (other * otherKg);
+    const cb20Kg    = invGet('inv-cb20-kg') || 20;
+    const cb10Kg    = invGet('inv-cb10-kg') || 10;
+    const brand2    = invStr('inv-main-brand2', 'Creative Baker');
+    const totalFlour = (cb20 * cb20Kg) + (cb10 * cb10Kg) + (other * otherKg);
     const flourEl = document.getElementById('inv-flour-total');
     const weeksEst = (totalFlour / 45).toFixed(1);
     if (flourEl) flourEl.textContent = totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks)';
 
     const parts = [];
-    if (cb20  > 0) parts.push(cb20  + ' × ' + mainBrand + ' 20 kg = ' + (cb20 * 20)       + ' kg');
-    if (cb10  > 0) parts.push(cb10  + ' × ' + mainBrand + ' 10 kg = ' + (cb10 * 10)       + ' kg');
-    if (other > 0) parts.push(other + ' × ' + otherName + ' ' + otherKg + ' kg = ' + (other * otherKg) + ' kg');
+    if (cb20  > 0) parts.push(cb20  + ' × ' + mainBrand + ', ' + cb20Kg + ' kg/bag = ' + (cb20 * cb20Kg) + ' kg');
+    if (cb10  > 0) parts.push(cb10  + ' × ' + brand2    + ', ' + cb10Kg + ' kg/bag = ' + (cb10 * cb10Kg) + ' kg');
+    if (other > 0) parts.push(other + ' × ' + otherName + ', ' + otherKg + ' kg/bag = ' + (other * otherKg) + ' kg');
 
     const sumEl = document.getElementById('inv-summary');
     if (sumEl) {
       const flourHtml = parts.length
         ? parts.map(p => '&bull; ' + p).join('<br>') +
-          '<br><strong>Total: ' + totalFlour.toFixed(1) + ' kg</strong>'
+          '<br><strong>Total: ' + totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks @ 45 kg/week)</strong>'
         : '&bull; No flour recorded';
       sumEl.innerHTML =
         '<strong style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.06em;opacity:0.7;">Flour</strong><br>' +
