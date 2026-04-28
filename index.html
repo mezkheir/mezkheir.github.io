@@ -1121,6 +1121,16 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       </div>
     </div>
 
+    <!-- Notes & Save -->
+    <div class="card" id="batch-notes-card" style="display:none;">
+      <div class="card-title">Batch Notes</div>
+      <textarea id="batch-notes" rows="3" placeholder="Add any notes about this batch (e.g. dough consistency, adjustments, timing)…" style="width:100%;box-sizing:border-box;border:1px solid var(--cream-border);border-radius:8px;padding:0.6rem 0.75rem;font-family:inherit;font-size:0.9rem;background:var(--card-bg);color:var(--text-main);resize:vertical;outline:none;"></textarea>
+      <button onclick="saveBatch()" style="margin-top:0.6rem;width:100%;background:var(--brown-dark);color:#fff;border:none;border-radius:10px;padding:0.55rem;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.03em;">
+        💾 Save to History
+      </button>
+      <div id="save-confirm" style="display:none;text-align:center;font-size:0.82rem;color:var(--amber);margin-top:0.4rem;font-weight:600;">✓ Batch saved!</div>
+    </div>
+
     <!-- Loaf Table -->
     <div class="card instr-collapsed" id="loaf-table-card">
       <div class="instr-toggle-row" onclick="this.closest('.card').classList.toggle('instr-collapsed')">
@@ -1145,15 +1155,6 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   </div>
 
-    <!-- Notes & Save -->
-    <div class="card" id="batch-notes-card" style="display:none;">
-      <div class="card-title">Batch Notes</div>
-      <textarea id="batch-notes" rows="3" placeholder="Add any notes about this batch (e.g. dough consistency, adjustments, timing)…" style="width:100%;box-sizing:border-box;border:1px solid var(--cream-border);border-radius:8px;padding:0.6rem 0.75rem;font-family:inherit;font-size:0.9rem;background:var(--card-bg);color:var(--text-main);resize:vertical;outline:none;"></textarea>
-      <button onclick="saveBatch()" style="margin-top:0.6rem;width:100%;background:var(--brown-dark);color:#fff;border:none;border-radius:10px;padding:0.55rem;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.03em;">
-        💾 Save to History
-      </button>
-      <div id="save-confirm" style="display:none;text-align:center;font-size:0.82rem;color:var(--amber);margin-top:0.4rem;font-weight:600;">✓ Batch saved!</div>
-    </div>
 
   <!-- Instructions -->
   <div class="card instr-collapsed" id="instr-card">
