@@ -1108,6 +1108,29 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       .print-header p  { font-size: 0.85rem; color: #555; margin: 0; }
     }
 
+    /* ── Feast Day Banner ── */
+    #feast-banner {
+      display: none;
+      background: linear-gradient(135deg, #1A3A6B 0%, #2558A8 100%);
+      color: #fff;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    #feast-banner.visible { display: flex; }
+    .feast-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .feast-body { flex: 1; }
+    .feast-name { font-weight: 700; font-size: 0.92rem; }
+    .feast-sub  { font-size: 0.78rem; opacity: 0.85; margin-top: 0.1rem; }
+    .feast-tag  {
+      display: inline-block; background: rgba(255,255,255,0.2);
+      border-radius: 20px; padding: 0.15rem 0.6rem;
+      font-size: 0.72rem; font-weight: 700; margin-top: 0.3rem;
+    }
+
   </style>
 </head>
 <body>
@@ -1148,6 +1171,16 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
 <div id="tab-home" class="tab-panel active">
 <main>
+
+<!-- Feast Day Banner -->
+<div id="feast-banner">
+  <div class="feast-icon">✝</div>
+  <div class="feast-body">
+    <div class="feast-name" id="feast-name"></div>
+    <div class="feast-sub" id="feast-sub"></div>
+    <span class="feast-tag" id="feast-tag"></span>
+  </div>
+</div>
 
 <!-- Mode Selector -->
   <div class="card mode-selector-card">
@@ -2631,6 +2664,94 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+</script>
+
+<script>
+  // ── Coptic Calendar — Feast Day Auto-Select ───────────────────────────────
+  // liturgy values: 'tuesday' | 'thursday' | 'saturday' | 'sunday'
+  // Categories: major feasts → sunday, long weekends → saturday, mid-week feasts → thursday
+  const FEAST_DAYS = [
+    // ── 2025 ──────────────────────────────────────────────────────────────────
+    // Long weekends → Saturday quantity
+    { d:'2025-01-01', name:'New Year Day',                  liturgy:'saturday', icon:'🎉' },
+    { d:'2025-03-17', name:'Family Day',                    liturgy:'saturday', icon:'👨‍👩‍👧' },
+    { d:'2025-05-19', name:'Victoria Day',                  liturgy:'saturday', icon:'🍁' },
+    { d:'2025-06-30', name:'Canada Day (observed)',         liturgy:'saturday', icon:'🍁' },
+    { d:'2025-08-04', name:'Civic Holiday',                 liturgy:'saturday', icon:'🍁' },
+    { d:'2025-09-01', name:'Labour Day',                    liturgy:'saturday', icon:'🍁' },
+    { d:'2025-10-13', name:'Thanksgiving',                  liturgy:'saturday', icon:'🍁' },
+    { d:'2025-12-25', name:'Christmas Day',                 liturgy:'saturday', icon:'🎄' },
+    { d:'2025-12-26', name:'Boxing Day',                    liturgy:'saturday', icon:'🎄' },
+    // Major Coptic feasts → Sunday quantity
+    { d:'2025-01-06', name:'Holy Nativity Feast',           liturgy:'sunday',   icon:'✝' },
+    { d:'2025-01-19', name:'Circumcision / Holy Epiphany',  liturgy:'sunday',   icon:'✝' },
+    { d:'2025-01-26', name:'Feast of Wedding of Cana',      liturgy:'sunday',   icon:'✝' },
+    { d:'2025-02-15', name:"Jonah's Feast / Presentation of the Lord", liturgy:'sunday', icon:'✝' },
+    { d:'2025-03-09', name:'Pope Kyrillos Feast',           liturgy:'sunday',   icon:'✝' },
+    { d:'2025-04-07', name:'Feast of Annunciation',         liturgy:'sunday',   icon:'✝' },
+    { d:'2025-04-13', name:'Palm Sunday',                   liturgy:'sunday',   icon:'🌿' },
+    { d:'2025-04-17', name:'Covenant Thursday',             liturgy:'sunday',   icon:'✝' },
+    { d:'2025-04-18', name:'Good Friday',                   liturgy:'sunday',   icon:'✝' },
+    { d:'2025-04-19', name:'Resurrection Feast Eve',        liturgy:'sunday',   icon:'☀' },
+    { d:'2025-05-29', name:'Ascension Feast',               liturgy:'sunday',   icon:'✝' },
+    { d:'2025-06-08', name:'Pentecost',                     liturgy:'sunday',   icon:'🕊' },
+    { d:'2025-07-12', name:"Apostle's Feast",               liturgy:'sunday',   icon:'✝' },
+    { d:'2025-08-22', name:'St. Mary Feast',                liturgy:'sunday',   icon:'✝' },
+    { d:'2025-09-14', name:'St. Verena Feast Day',          liturgy:'sunday',   icon:'✝' },
+    { d:'2025-09-22', name:'St. Maurice Feast Day',         liturgy:'sunday',   icon:'✝' },
+    // Mid-week fasting start → Thursday quantity
+    { d:'2025-02-09', name:"Start of Jonah's Fasting",      liturgy:'thursday', icon:'🙏' },
+    // ── 2026 ──────────────────────────────────────────────────────────────────
+    { d:'2026-01-01', name:'New Year Day',                  liturgy:'saturday', icon:'🎉' },
+    { d:'2026-01-05', name:'Holy Nativity Feast Eve',       liturgy:'sunday',   icon:'✝' },
+    { d:'2026-01-07', name:'Holy Nativity Feast',           liturgy:'sunday',   icon:'✝' },
+  ];
+
+  const LITURGY_LABELS = {
+    tuesday:  'Tuesday Liturgy quantities',
+    thursday: 'Thursday Liturgy quantities',
+    saturday: 'Saturday Liturgy quantities',
+    sunday:   'Sunday Liturgy quantities',
+  };
+
+  function initFeastBanner() {
+    const today = new Date();
+    const pad   = n => String(n).padStart(2, '0');
+    const key   = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+    const feast = FEAST_DAYS.find(f => f.d === key);
+
+    if (!feast) {
+      // No feast — just auto-select by day of week
+      autoSelectByDayOfWeek();
+      return;
+    }
+
+    // Show feast banner
+    const banner = document.getElementById('feast-banner');
+    document.getElementById('feast-name').textContent = feast.icon + '  ' + feast.name;
+    document.getElementById('feast-sub').textContent  = 'Liturgy quantities auto-selected — override below if needed.';
+    document.getElementById('feast-tag').textContent  = LITURGY_LABELS[feast.liturgy];
+    if (banner) banner.classList.add('visible');
+
+    // Auto-select the liturgy
+    selectLiturgyKey(feast.liturgy);
+  }
+
+  function autoSelectByDayOfWeek() {
+    const day = new Date().getDay(); // 0=Sun,1=Mon,...,6=Sat
+    const map  = { 0:'sunday', 2:'tuesday', 4:'thursday', 6:'saturday' };
+    const key  = map[day];
+    if (key) selectLiturgyKey(key);
+  }
+
+  function selectLiturgyKey(key) {
+    const btn = document.querySelector(`.liturgy-btn[data-liturgy="${key}"]`);
+    if (!btn) return;
+    // Simulate a click so all existing selection logic runs correctly
+    btn.click();
+  }
+
+  document.addEventListener('DOMContentLoaded', initFeastBanner);
 </script>
 
 <script>
