@@ -996,6 +996,51 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       font-size:0.88rem; font-weight:700; color:var(--text-dark);
     }
     .inv-total-val { font-size:1.05rem; color:var(--amber); }
+    /* ══════════════════════════════════════════════════════
+       Desktop layout — sidebar nav (≥ 768px)
+       ══════════════════════════════════════════════════════ */
+    @media (min-width: 768px) {
+      body { padding-left: 180px; }
+
+      /* Sidebar */
+      .bottom-nav {
+        top: 0; bottom: 0; left: 0; right: auto;
+        width: 180px;
+        flex-direction: column;
+        align-items: stretch;
+        border-top: none;
+        border-right: 1px solid var(--cream-border);
+        box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+        padding: 1.5rem 0.5rem 1rem;
+        overflow-y: auto;
+      }
+
+      /* Nav items become horizontal rows */
+      .nav-btn {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 0.7rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border-radius: 10px;
+        margin-bottom: 0.2rem;
+        text-align: left;
+      }
+      .nav-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+      .nav-btn.active {
+        background: color-mix(in srgb, var(--brown-dark) 10%, transparent);
+        border-radius: 10px;
+      }
+
+      /* Offset fixed floating elements */
+      #timer-bar  { left: 180px; bottom: 0; }
+      #timer-toast { left: calc(50% + 90px); }
+      #ptr-indicator { left: 180px; }
+      footer { margin-left: 0; }
+    }
+
   </style>
 </head>
 <body>
