@@ -887,6 +887,20 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
     /* ── Checklist Mode ── */
     .step-body { flex:1; min-width:0; }
+    /* Collapsible instruction card */
+    #instr-card .instr-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none; -webkit-user-select: none;
+      padding: 0.1rem 0;
+    }
+    #instr-card .instr-chevron {
+      font-size: 0.85rem; color: var(--text-light);
+      transition: transform 0.2s ease;
+      line-height: 1;
+    }
+    #instr-card.instr-collapsed .instr-chevron { transform: rotate(-90deg); }
+    #instr-card .instr-body { overflow: hidden; }
+    #instr-card.instr-collapsed .instr-body { display: none; }
       display:flex; align-items:center; gap:0.3rem;
       background:var(--cream-light); border:1.5px solid var(--cream-border);
       border-radius:16px; padding:0.3rem 0.7rem; font-size:0.78rem; font-weight:700;
@@ -1137,8 +1151,12 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     </div>
 
   <!-- Instructions -->
-  <div class="card" id="instr-card">
-    <div class="card-title">Step-by-Step Instructions</div>
+  <div class="card instr-collapsed" id="instr-card">
+    <div class="instr-toggle-row" onclick="toggleInstrCard()">
+      <div class="card-title" style="margin:0;">Step-by-Step Instructions</div>
+      <span class="instr-chevron">&#9660;</span>
+    </div>
+    <div class="instr-body">
 
     <div class="instr-section-label instr-bread">Preparation</div>
     <ul class="instructions-list instr-bread">
@@ -1231,6 +1249,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       <li data-step="22"><div class="step-num">17</div><div class="step-body"><span>Report flour and yeast inventory to the Orban leaders group.</span></div></li>
       <li data-step="23"><div class="step-num">18</div><div class="step-body"><span>🙏 God bless your service and reward everyone with heavenly blessings.</span></div></li>
     </ul>
+    </div><!-- end instr-body -->
   </div>
 
   <!-- Note -->
@@ -1997,6 +2016,10 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     });
   });
 
+
+  function toggleInstrCard() {
+    document.getElementById('instr-card').classList.toggle('instr-collapsed');
+  }
 
   function autoCalculate() {
     const flourKg = parseFloat(document.getElementById('custom-kg').value);
