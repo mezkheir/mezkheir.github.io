@@ -2556,7 +2556,8 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     if (cb20  > 0) lines.push('  • ' + mainBrand + ', ' + cb20Kg + ' kg/bag: ' + cb20  + ' bag' + (cb20  !== 1 ? 's' : '') + ' (' + (cb20 * cb20Kg) + ' kg)');
     if (cb10  > 0) lines.push('  • ' + brand2    + ', ' + cb10Kg + ' kg/bag: ' + cb10  + ' bag' + (cb10  !== 1 ? 's' : '') + ' (' + (cb10 * cb10Kg) + ' kg)');
     if (other > 0) lines.push('  • ' + otherName + ' (' + otherKg + ' kg): ' + other + ' bag' + (other !== 1 ? 's' : '') + ' (' + (other * otherKg) + ' kg)');
-    lines.push('  Total: ' + totalFlour.toFixed(1) + ' kg');
+    const weeksEst = (totalFlour / 45).toFixed(1);
+    lines.push('  Total: ' + totalFlour.toFixed(1) + ' kg  (' + weeksEst + ' wks @ 45 kg/week)');
     lines.push('', '📦 Other Stock');
     lines.push('  • Yeast: ' + yeast + ' box' + (yeast !== 1 ? 'es' : ''));
     lines.push('  • Scalding Dough: ' + scald + ' kg');
