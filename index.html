@@ -1122,19 +1122,24 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     </div>
 
     <!-- Loaf Table -->
-    <div class="card" id="loaf-table-card">
-      <div class="card-title">Possible Orban Count from This Batch</div>
-      <div class="loaf-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Size</th>
-              <th>Weight Each</th>
-              <th>Orban You Can Make</th>
-            </tr>
-          </thead>
-          <tbody id="loaf-table-body"></tbody>
-        </table>
+    <div class="card instr-collapsed" id="loaf-table-card">
+      <div class="instr-toggle-row" onclick="this.closest('.card').classList.toggle('instr-collapsed')">
+        <div class="card-title" style="margin:0;">Possible Orban Count from This Batch</div>
+        <span class="instr-chevron">&#9660;</span>
+      </div>
+      <div class="instr-body">
+        <div class="loaf-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Size</th>
+                <th>Weight Each</th>
+                <th>Orban You Can Make</th>
+              </tr>
+            </thead>
+            <tbody id="loaf-table-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
