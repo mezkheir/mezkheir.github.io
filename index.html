@@ -887,20 +887,20 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
     /* ── Checklist Mode ── */
     .step-body { flex:1; min-width:0; }
-    /* Collapsible instruction card */
-    #instr-card .instr-toggle-row {
+    /* Collapsible cards (generic) */
+    .instr-toggle-row {
       display: flex; align-items: center; justify-content: space-between;
       cursor: pointer; user-select: none; -webkit-user-select: none;
       padding: 0.1rem 0;
     }
-    #instr-card .instr-chevron {
+    .instr-chevron {
       font-size: 0.85rem; color: var(--text-light);
       transition: transform 0.2s ease;
       line-height: 1;
     }
-    #instr-card.instr-collapsed .instr-chevron { transform: rotate(-90deg); }
-    #instr-card .instr-body { overflow: hidden; }
-    #instr-card.instr-collapsed .instr-body { display: none; }
+    .instr-collapsed .instr-chevron { transform: rotate(-90deg); }
+    .instr-body { overflow: hidden; }
+    .instr-collapsed .instr-body { display: none; }
       display:flex; align-items:center; gap:0.3rem;
       background:var(--cream-light); border:1.5px solid var(--cream-border);
       border-radius:16px; padding:0.3rem 0.7rem; font-size:0.78rem; font-weight:700;
