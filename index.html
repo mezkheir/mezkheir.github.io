@@ -1193,6 +1193,26 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   .cal-chip-holiday { background:#7a5c00; color:#fff; }
   .cal-chip-fast    { background:#1e3a6e; color:#fff; }
   .cal-chip-today   { background:var(--amber); color:#fff; }
+  /* ── Partner Church Requests ───────────────────────────────────────── */
+  .cal-cell.cal-partner        { background:#5a2a8a; color:#fff; cursor:pointer; }
+  .cal-cell.cal-partner:hover  { background:#6e3aaa; }
+  .cal-chip-partner            { background:#5a2a8a; color:#fff; }
+  .partner-notice {
+    display:none; background:#f0e8f8; border:1px solid #c8a0e8;
+    border-radius:var(--radius-sm); padding:0.5rem 0.75rem;
+    font-size:0.85rem; color:#3d1468; margin-bottom:0.6rem;
+  }
+  .partner-notice.visible { display:block; }
+  .partner-row {
+    display:flex; align-items:flex-start; gap:0.6rem;
+    padding:0.55rem 0; border-bottom:1px solid var(--cream-border);
+  }
+  .partner-row:last-child { border-bottom:none; }
+  .partner-row-date  { font-size:0.78rem; color:var(--text-light); min-width:5.5rem; padding-top:0.1rem; }
+  .partner-row-info  { flex:1; font-size:0.88rem; line-height:1.45; }
+  .partner-row-badge { display:inline-block; background:#5a2a8a; color:#fff;
+    font-size:0.72rem; font-weight:700; padding:0.1rem 0.45rem;
+    border-radius:20px; margin-left:0.35rem; }
 </style>
 </head>
 <body>
@@ -1315,6 +1335,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
             </div>
           </div>
         </div>
+        <div id="partner-notice" class="partner-notice"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
           <div>
             <div class="override-label">Additional – Orban</div>
@@ -1951,8 +1972,24 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         <span class="cal-legend-chip cal-chip-feast">✝ Feast</span>
         <span class="cal-legend-chip cal-chip-holiday">🍁 Long Weekend</span>
         <span class="cal-legend-chip cal-chip-fast">🙏 Fasting</span>
+        <span class="cal-legend-chip cal-chip-partner">🏛 Partner</span>
         <span class="cal-legend-chip cal-chip-today">● Today</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Partner Church Schedule card ──────────────────────────────── -->
+  <div class="card instr-collapsed" id="partner-card">
+    <div class="instr-toggle-row" onclick="this.closest('.card').classList.toggle('instr-collapsed')">
+      <div class="card-title" style="margin:0;">🏛 Partner Church Schedule</div>
+      <span class="instr-chevron">&#9660;</span>
+    </div>
+    <div class="instr-body">
+      <p style="font-size:0.82rem;color:var(--text-light);margin:0 0 0.5rem;">
+        Upcoming Orban requests from partner churches. On the matching date,
+        the Additional Orban fields on the Home tab auto-fill.
+      </p>
+      <div id="partner-schedule-list"></div>
     </div>
   </div>
 
@@ -2963,11 +3000,12 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   let _calYear, _calMonth;
 
   function initCalendar() {
-    if (_calYear !== undefined) { renderCalendar(); return; }
+    if (_calYear !== undefined) { renderCalendar(); renderPartnerSchedule(); return; }
     const now  = new Date();
     _calYear   = now.getFullYear();
     _calMonth  = now.getMonth();
     renderCalendar();
+    renderPartnerSchedule();
   }
 
   function calMove(delta) {
@@ -3004,6 +3042,14 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
         fMap[d].push(f);
       }
     });
+    const pMap = {};
+    PARTNER_REQUESTS.forEach(r => {
+      if (r.d.startsWith(mKey)) {
+        const d = parseInt(r.d.slice(8));
+        if (!pMap[d]) pMap[d] = [];
+        pMap[d].push(r);
+      }
+    });
 
     const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
     const firstDayRaw = new Date(_calYear, _calMonth, 1).getDay(); // 0=Sun
@@ -3016,21 +3062,25 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dStr   = `${_calYear}-${padZ(_calMonth+1)}-${padZ(d)}`;
-      const feasts = fMap[d] || [];
-      const isToday = dStr === todayStr;
+      const feasts   = fMap[d] || [];
+      const partners = pMap[d] || [];
+      const isToday  = dStr === todayStr;
 
       let cls = 'cal-cell';
       let onclick = '';
       let dot = '';
 
-      if (feasts.length) {
+      if (feasts.length || partners.length) {
         const cats = feasts.map(getFeastCat);
         if      (cats.includes('feast'))   cls += ' cal-feast';
         else if (cats.includes('holiday')) cls += ' cal-holiday';
-        else                               cls += ' cal-fast';
+        else if (cats.includes('fast'))    cls += ' cal-fast';
+        else if (partners.length)          cls += ' cal-partner';
         if (isToday) cls += ' cal-today';
-        const detail = JSON.stringify(feasts.map(f => f.icon + ' ' + f.name).join('  ·  '));
-        onclick = `onclick="calShowEvent(${detail})"`;
+        const feastPart   = feasts.map(f => f.icon + ' ' + f.name).join('  ·  ');
+        const partnerPart = partners.map(r => `🏛 ${r.church}: ${r.count} Korban (${r.size} g)`).join('  ·  ');
+        const combined    = [feastPart, partnerPart].filter(Boolean).join('   |   ');
+        onclick = `onclick="calShowEvent(${JSON.stringify(combined)})"`;
         dot = '<div class="cal-dot"></div>';
       } else if (isToday) {
         cls += ' cal-today';
@@ -3049,6 +3099,63 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     if (!det) return;
     det.textContent = text;
     det.classList.add('visible');
+  }
+
+  // ── Partner Church Requests ───────────────────────────────────────────────
+  const PARTNER_REQUESTS = [
+    { d:'2026-06-06', church:'Chapel Place', count:4, size:750 },
+    { d:'2026-06-20', church:'Chapel Place', count:3, size:750 },
+    { d:'2026-07-04', church:'Chapel Place', count:3, size:750 },
+    { d:'2026-07-18', church:'Chapel Place', count:3, size:750 },
+    { d:'2026-08-01', church:'Chapel Place', count:3, size:750 },
+    { d:'2026-08-15', church:'Chapel Place', count:3, size:750 },
+  ];
+
+  // Auto-fill additional orban fields if today has a partner request
+  function checkPartnerRequest() {
+    const today = new Date();
+    const padZ  = n => String(n).padStart(2,'0');
+    const key   = `${today.getFullYear()}-${padZ(today.getMonth()+1)}-${padZ(today.getDate())}`;
+    const req   = PARTNER_REQUESTS.find(r => r.d === key);
+    const notice = document.getElementById('partner-notice');
+    if (req) {
+      const cEl = document.getElementById('override-loaves-extra');
+      const sEl = document.getElementById('override-size-extra');
+      if (cEl && (parseFloat(cEl.value) || 0) === 0) cEl.value = req.count;
+      if (sEl && (parseFloat(sEl.value) || 0) === 0) sEl.value = req.size;
+      if (notice) {
+        notice.textContent = `🏛 ${req.church} request today: ${req.count} Korban × ${req.size} g — additional fields auto-filled below`;
+        notice.classList.add('visible');
+      }
+      if (typeof autoCalculate === 'function') autoCalculate();
+    } else {
+      if (notice) notice.classList.remove('visible');
+    }
+  }
+
+  // Render upcoming partner schedule list
+  function renderPartnerSchedule() {
+    const list = document.getElementById('partner-schedule-list');
+    if (!list) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = PARTNER_REQUESTS
+      .map(r => ({ ...r, dateObj: new Date(r.d + 'T00:00:00') }))
+      .filter(r => r.dateObj >= today)
+      .sort((a, b) => a.dateObj - b.dateObj);
+    if (!upcoming.length) {
+      list.innerHTML = '<p style="font-size:0.85rem;color:var(--text-light);">No upcoming partner requests.</p>';
+      return;
+    }
+    list.innerHTML = upcoming.map(r => {
+      const lbl = r.dateObj.toLocaleDateString('en-CA', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+      return `<div class="partner-row">
+        <div class="partner-row-date">${lbl}</div>
+        <div class="partner-row-info">
+          🏛 <strong>${r.church}</strong>
+          <span class="partner-row-badge">${r.count} Korban × ${r.size} g</span>
+        </div>
+      </div>`;
+    }).join('');
   }
 
   document.addEventListener('DOMContentLoaded', initFeastBanner);
@@ -3281,6 +3388,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   // Always run on DOMContentLoaded regardless of current readyState
   document.addEventListener('DOMContentLoaded', invLoad);
+  document.addEventListener('DOMContentLoaded', checkPartnerRequest);
   // Also call immediately in case DOM is already ready
   if (document.readyState !== 'loading') invLoad();
 </script>
