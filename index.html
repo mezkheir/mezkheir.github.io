@@ -3008,23 +3008,38 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const twoWeekEnd = new Date(weekStart); twoWeekEnd.setDate(weekStart.getDate() + 13);
     twoWeekEnd.setHours(23,59,59,999);
 
-    const upcoming = FEAST_DAYS
-      .map(f => ({ ...f, dateObj: new Date(f.d + 'T00:00:00') }))
-      .filter(f => f.dateObj >= today && f.dateObj <= twoWeekEnd)
+    const feastItems = FEAST_DAYS
+      .map(f => ({ ...f, dateObj: new Date(f.d + 'T00:00:00'), kind: 'feast' }))
+      .filter(f => f.dateObj >= today && f.dateObj <= twoWeekEnd);
+
+    const partnerItems = PARTNER_REQUESTS
+      .map(r => ({ ...r, dateObj: new Date(r.d + 'T00:00:00'), kind: 'partner' }))
+      .filter(r => r.dateObj >= today && r.dateObj <= twoWeekEnd);
+
+    const upcoming = [...feastItems, ...partnerItems]
       .sort((a, b) => a.dateObj - b.dateObj);
 
-    if (!upcoming.length) { list.textContent = 'No feasts or long weekends in the next two weeks.'; return; }
+    if (!upcoming.length) { list.textContent = 'No feasts, long weekends, or partner requests in the next two weeks.'; return; }
 
-    list.innerHTML = upcoming.map(f => {
-      const label = f.dateObj.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
-      const tier  = LITURGY_LABELS[f.liturgy];
+    list.innerHTML = upcoming.map(item => {
+      const label = item.dateObj.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
+      if (item.kind === 'partner') {
+        return `<div class="upcoming-feast-row">
+          <div class="upcoming-feast-date">${label}</div>
+          <div class="upcoming-feast-info">
+            <div class="upcoming-feast-name">🏛 ${item.church}</div>
+            <div class="upcoming-feast-tier">${item.count} Korban × ${item.size} g</div>
+          </div>
+        </div>`;
+      }
+      const tier = LITURGY_LABELS[item.liturgy];
       return `<div class="upcoming-feast-row">
         <div class="upcoming-feast-date">${label}</div>
         <div class="upcoming-feast-info">
-          <div class="upcoming-feast-name">${f.icon} ${f.name}</div>
+          <div class="upcoming-feast-name">${item.icon} ${item.name}</div>
           <div class="upcoming-feast-tier">${tier}</div>
         </div>
-        <button class="upcoming-remind-btn" onclick="addReminderForFeast(${JSON.stringify(f.d)}, ${JSON.stringify(f.name)}, ${JSON.stringify(f.liturgy)})">📅 Remind</button>
+        <button class="upcoming-remind-btn" onclick="addReminderForFeast(${JSON.stringify(item.d)}, ${JSON.stringify(item.name)}, ${JSON.stringify(item.liturgy)})">📅 Remind</button>
       </div>`;
     }).join('');
   }
