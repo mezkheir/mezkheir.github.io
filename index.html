@@ -1233,41 +1233,42 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   .inv-flour-summary {
     margin-top: 0.75rem;
     border-radius: var(--radius);
-    background: var(--navy);
+    background: var(--cream-light);
+    border: 1.5px solid var(--cream-border);
     overflow: hidden;
   }
   .inv-summary-header {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
-    padding: 0.55rem 0.9rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-light);
+    padding: 0.5rem 0.9rem;
+    border-bottom: 1px solid var(--cream-border);
   }
-  .inv-summary-header strong { color: rgba(255,255,255,0.9); }
+  .inv-summary-header strong { color: var(--brown-dark); }
   .inv-summary-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: rgba(255,255,255,0.1);
+    gap: 0;
   }
   .inv-summary-stat {
-    background: var(--navy);
-    padding: 0.6rem 0.9rem 0.75rem;
+    padding: 0.65rem 0.9rem 0.8rem;
+    border-right: 1px solid var(--cream-border);
   }
+  .inv-summary-stat:last-child { border-right: none; }
   .inv-summary-label {
     font-size: 0.67rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
-    margin-bottom: 0.2rem;
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
   }
   .inv-summary-val {
     font-size: 1.45rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--brown-dark);
     line-height: 1.1;
   }
 </style>
