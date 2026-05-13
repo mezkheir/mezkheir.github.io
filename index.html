@@ -2930,13 +2930,19 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const today = new Date();
     today.setHours(0,0,0,0);
 
+    // Show current week (Mon–Sun) + the full following week
+    const dayOfWeek  = today.getDay(); // 0=Sun
+    const toMonday   = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const weekStart  = new Date(today); weekStart.setDate(today.getDate() + toMonday);
+    const twoWeekEnd = new Date(weekStart); twoWeekEnd.setDate(weekStart.getDate() + 13);
+    twoWeekEnd.setHours(23,59,59,999);
+
     const upcoming = FEAST_DAYS
       .map(f => ({ ...f, dateObj: new Date(f.d + 'T00:00:00') }))
-      .filter(f => f.dateObj >= today)
-      .sort((a, b) => a.dateObj - b.dateObj)
-      .slice(0, 8);
+      .filter(f => f.dateObj >= today && f.dateObj <= twoWeekEnd)
+      .sort((a, b) => a.dateObj - b.dateObj);
 
-    if (!upcoming.length) { list.textContent = 'No upcoming feasts in the calendar.'; return; }
+    if (!upcoming.length) { list.textContent = 'No feasts or long weekends in the next two weeks.'; return; }
 
     list.innerHTML = upcoming.map(f => {
       const label = f.dateObj.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
