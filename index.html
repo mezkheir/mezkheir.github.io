@@ -1229,6 +1229,47 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
   .partner-row-badge { display:inline-block; background:#5a2a8a; color:#fff;
     font-size:0.72rem; font-weight:700; padding:0.1rem 0.45rem;
     border-radius:20px; margin-left:0.35rem; }
+  /* ── Inventory Flour Summary Card ──────────────────────────────────── */
+  .inv-flour-summary {
+    margin-top: 0.75rem;
+    border-radius: var(--radius);
+    background: var(--navy);
+    overflow: hidden;
+  }
+  .inv-summary-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .inv-summary-header strong { color: rgba(255,255,255,0.9); }
+  .inv-summary-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.1);
+  }
+  .inv-summary-stat {
+    background: var(--navy);
+    padding: 0.6rem 0.9rem 0.75rem;
+  }
+  .inv-summary-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.2rem;
+  }
+  .inv-summary-val {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+  }
 </style>
 </head>
 <body>
@@ -1906,12 +1947,25 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
           <td><input type="number" id="inv-other-kg" value="10" min="1" step="1" oninput="invUpdate()"></td>
           <td><input type="number" id="inv-other-count" value="5" min="0" step="1" oninput="invUpdate()"></td>
         </tr>
-        <tr class="inv-total-row">
-          <td colspan="2">Total Flour</td>
-          <td id="inv-flour-total" style="text-align:right;">—</td>
-        </tr>
       </tbody>
     </table>
+
+    <!-- Flour summary card -->
+    <div class="inv-flour-summary">
+      <div class="inv-summary-header">
+        🌾 Flour Stock &nbsp;·&nbsp; <strong id="inv-summary-total-kg">—</strong>
+      </div>
+      <div class="inv-summary-stats">
+        <div class="inv-summary-stat">
+          <div class="inv-summary-label">Total Flour</div>
+          <div class="inv-summary-val" id="inv-flour-total">—</div>
+        </div>
+        <div class="inv-summary-stat">
+          <div class="inv-summary-label">Est. Weeks</div>
+          <div class="inv-summary-val" id="inv-summary-weeks">—</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Other Stock -->
@@ -3314,7 +3368,13 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     const totalFlour = (cb20 * cb20Kg) + (cb10 * cb10Kg) + (other * otherKg);
     const flourEl = document.getElementById('inv-flour-total');
     const weeksEst = (totalFlour / 45).toFixed(1);
-    if (flourEl) flourEl.textContent = fmtN(totalFlour,1) + ' kg  (' + fmtN(totalFlour/45,1) + ' wks)';
+    const weeksVal   = fmtN(totalFlour / 45, 1);
+    const totalKgTxt = fmtN(totalFlour, 1) + ' kg';
+    if (flourEl) flourEl.textContent = totalKgTxt;
+    const weeksEl  = document.getElementById('inv-summary-weeks');
+    const headerEl = document.getElementById('inv-summary-total-kg');
+    if (weeksEl)  weeksEl.textContent  = weeksVal + ' wks';
+    if (headerEl) headerEl.textContent = totalKgTxt + '  ·  ' + weeksVal + ' wks @ 45 kg/wk';
 
     const parts = [];
     if (cb20  > 0) parts.push(cb20  + ' × ' + mainBrand + ', ' + cb20Kg + ' kg/bag = ' + (cb20 * cb20Kg) + ' kg');
