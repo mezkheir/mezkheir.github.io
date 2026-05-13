@@ -2749,9 +2749,43 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     // Mid-week fasting start → Thursday quantity
     { d:'2025-02-09', name:"Start of Jonah's Fasting",      liturgy:'thursday', icon:'🙏' },
     // ── 2026 ──────────────────────────────────────────────────────────────────
-    { d:'2026-01-01', name:'New Year Day',                  liturgy:'saturday', icon:'🎉' },
-    { d:'2026-01-05', name:'Holy Nativity Feast Eve',       liturgy:'sunday',   icon:'✝' },
-    { d:'2026-01-07', name:'Holy Nativity Feast',           liturgy:'sunday',   icon:'✝' },
+    // Long weekends → Saturday quantity
+    { d:'2026-01-01', name:'New Year Day',                              liturgy:'saturday', icon:'🎉' },
+    { d:'2026-02-16', name:'Family Day / Start of Holy Great Fast',     liturgy:'saturday', icon:'👨‍👩‍👧' },
+    { d:'2026-05-18', name:'Victoria Day long weekend',                 liturgy:'saturday', icon:'🍁' },
+    { d:'2026-07-01', name:'Canada Day',                                liturgy:'saturday', icon:'🍁' },
+    { d:'2026-08-03', name:'Civic Holiday / Start of St. Mary Fast',   liturgy:'saturday', icon:'🍁' },
+    { d:'2026-09-07', name:'Labour Day',                                liturgy:'saturday', icon:'🍁' },
+    { d:'2026-10-12', name:'Thanksgiving long weekend',                 liturgy:'saturday', icon:'🍁' },
+    { d:'2026-12-25', name:'Christmas Day',                             liturgy:'saturday', icon:'🎄' },
+    { d:'2026-12-26', name:'Boxing Day',                                liturgy:'saturday', icon:'🎄' },
+    // Major Coptic feasts → Sunday quantity
+    { d:'2026-01-05', name:'Holy Nativity Feast Eve',                   liturgy:'sunday',   icon:'✝' },
+    { d:'2026-01-07', name:'Holy Nativity Feast',                       liturgy:'sunday',   icon:'✝' },
+    { d:'2026-01-19', name:'Holy Epiphany / Wedding of Cana',           liturgy:'sunday',   icon:'✝' },
+    { d:'2026-02-15', name:"Jonah's Feast / Presentation of the Lord",  liturgy:'sunday',   icon:'✝' },
+    { d:'2026-03-22', name:'Feast of the Cross',                        liturgy:'sunday',   icon:'✝' },
+    { d:'2026-04-05', name:'Palm Sunday',                               liturgy:'sunday',   icon:'🌿' },
+    { d:'2026-04-07', name:'Feast of Annunciation',                     liturgy:'sunday',   icon:'✝' },
+    { d:'2026-04-10', name:'Good Friday',                               liturgy:'sunday',   icon:'✝' },
+    { d:'2026-04-12', name:'Feast of Resurrection (Pascha)',            liturgy:'sunday',   icon:'☀' },
+    { d:'2026-05-21', name:'Feast of Ascension',                        liturgy:'sunday',   icon:'✝' },
+    { d:'2026-05-31', name:'Holy Pentecost Feast',                      liturgy:'sunday',   icon:'🕊' },
+    { d:'2026-06-07', name:"Entry of the Lord into Egypt / Start of Apostles' Fast", liturgy:'sunday', icon:'✝' },
+    { d:'2026-07-12', name:"Apostles' Feast",                           liturgy:'sunday',   icon:'✝' },
+    { d:'2026-08-22', name:'St. Mary Feast',                            liturgy:'saturday', icon:'✝' },
+    { d:'2026-09-27', name:'Feast of the Cross',                        liturgy:'sunday',   icon:'✝' },
+    // Mid-week feasts → Thursday quantity
+    { d:'2026-01-14', name:'Circumcision Feast',                        liturgy:'thursday', icon:'✝' },
+    { d:'2026-02-02', name:"Start of Jonah's Fasting",                  liturgy:'thursday', icon:'🙏' },
+    { d:'2026-04-04', name:'Lazarus Saturday',                          liturgy:'saturday', icon:'🌿' },
+    { d:'2026-04-09', name:'Covenant Thursday',                         liturgy:'thursday', icon:'✝' },
+    { d:'2026-09-11', name:'Nayrouz – Coptic New Year',                 liturgy:'thursday', icon:'✝' },
+    { d:'2026-11-27', name:'Start of Nativity Fast (Kiahk)',            liturgy:'thursday', icon:'🙏' },
+    // ── 2027 ──────────────────────────────────────────────────────────────────
+    { d:'2027-01-01', name:'New Year Day',                              liturgy:'saturday', icon:'🎉' },
+    { d:'2027-01-06', name:'Holy Nativity Feast Eve',                   liturgy:'sunday',   icon:'✝' },
+    { d:'2027-01-07', name:'Holy Nativity Feast',                       liturgy:'sunday',   icon:'✝' },
   ];
 
   const LITURGY_LABELS = {
@@ -2808,7 +2842,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       .map(f => ({ ...f, dateObj: new Date(f.d + 'T00:00:00') }))
       .filter(f => f.dateObj >= today)
       .sort((a, b) => a.dateObj - b.dateObj)
-      .slice(0, 5);
+      .slice(0, 8);
 
     if (!upcoming.length) { list.textContent = 'No upcoming feasts in the calendar.'; return; }
 
