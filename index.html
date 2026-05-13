@@ -1163,7 +1163,37 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     }
     .upcoming-remind-btn:active { background: var(--cream-light, #EDF3FB); }
 
-  </style>
+
+  /* ── Church Calendar ────────────────────────────────────────────────── */
+  .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; }
+  .cal-nav-btn { background:none; border:1px solid var(--cream-border); border-radius:var(--radius-sm); padding:0.3rem 0.8rem; cursor:pointer; font-size:1.15rem; color:var(--text-dark); line-height:1; }
+  .cal-nav-btn:hover { background:var(--cream-dark,#e8ddd0); }
+  #cal-month-label { font-weight:700; font-size:1rem; color:var(--text-dark); }
+  #cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+  .cal-hdr  { text-align:center; font-size:0.68rem; font-weight:700; color:var(--text-light); padding:0.2rem 0; }
+  .cal-cell { min-height:2.4rem; display:flex; flex-direction:column; align-items:center;
+              justify-content:center; border-radius:6px; font-size:0.82rem; padding:0.1rem 0; }
+  .cal-cell.empty   { background:none; }
+  .cal-cell.cal-today   { background:var(--amber); color:#fff; font-weight:700; }
+  .cal-cell.cal-feast   { background:#7a1c1c; color:#fff; cursor:pointer; }
+  .cal-cell.cal-holiday { background:#7a5c00; color:#fff; cursor:pointer; }
+  .cal-cell.cal-fast    { background:#1e3a6e; color:#fff; cursor:pointer; }
+  .cal-cell.cal-feast:hover   { background:#9a2424; }
+  .cal-cell.cal-holiday:hover { background:#9a7000; }
+  .cal-cell.cal-fast:hover    { background:#2a4d8e; }
+  .cal-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.7); margin-top:2px; }
+  #cal-event-detail { display:none; margin-top:0.6rem; padding:0.5rem 0.75rem;
+    font-size:0.85rem; color:var(--text-dark); background:var(--cream);
+    border:1px solid var(--cream-border); border-radius:var(--radius-sm); line-height:1.5; }
+  #cal-event-detail.visible { display:block; }
+  .cal-legend { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem; }
+  .cal-legend-chip { display:inline-flex; align-items:center; gap:0.3rem; font-size:0.72rem;
+    padding:0.2rem 0.55rem; border-radius:20px; font-weight:600; }
+  .cal-chip-feast   { background:#7a1c1c; color:#fff; }
+  .cal-chip-holiday { background:#7a5c00; color:#fff; }
+  .cal-chip-fast    { background:#1e3a6e; color:#fff; }
+  .cal-chip-today   { background:var(--amber); color:#fff; }
+</style>
 </head>
 <body>
 <div id="ptr-indicator"><div class="ptr-spinner"></div></div>
@@ -1902,6 +1932,30 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
     <h2>Settings</h2>
     <p>Adjust display and recipe defaults</p>
   </div>
+
+  <!-- ── Church Calendar card ───────────────────────────────────────── -->
+  <div class="card" id="cal-card">
+    <div class="instr-toggle-row" onclick="this.closest('.card').classList.toggle('instr-collapsed')">
+      <div class="card-title" style="margin:0;">📅 Church Calendar</div>
+      <span class="instr-chevron">&#9660;</span>
+    </div>
+    <div class="instr-body">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calMove(-1)">&#8249;</button>
+        <span id="cal-month-label"></span>
+        <button class="cal-nav-btn" onclick="calMove(1)">&#8250;</button>
+      </div>
+      <div id="cal-grid"></div>
+      <div id="cal-event-detail"></div>
+      <div class="cal-legend">
+        <span class="cal-legend-chip cal-chip-feast">✝ Feast</span>
+        <span class="cal-legend-chip cal-chip-holiday">🍁 Long Weekend</span>
+        <span class="cal-legend-chip cal-chip-fast">🙏 Fasting</span>
+        <span class="cal-legend-chip cal-chip-today">● Today</span>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="instr-section-label" style="margin-top:1rem;">Display</div>
       <div class="settings-grid">
@@ -2045,6 +2099,7 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
       updateHomeIcon();
       if (tab === 'home') autoCalculate();
       if (tab === 'inventory' && typeof invUpdate === 'function') invUpdate();
+      if (tab === 'settings'   && typeof initCalendar   === 'function') initCalendar();
     });
   });
   updateHomeIcon(); // set initial state
@@ -2902,6 +2957,98 @@ td.count { font-weight: 700; color: var(--brown-dark); font-size: calc(1rem * va
 
   function addFeastReminder() {
     if (_todayFeast) addReminderForFeast(_todayFeast.d, _todayFeast.name, _todayFeast.liturgy);
+  }
+
+  // ── Church Calendar ───────────────────────────────────────────────────────
+  let _calYear, _calMonth;
+
+  function initCalendar() {
+    if (_calYear !== undefined) { renderCalendar(); return; }
+    const now  = new Date();
+    _calYear   = now.getFullYear();
+    _calMonth  = now.getMonth();
+    renderCalendar();
+  }
+
+  function calMove(delta) {
+    _calMonth += delta;
+    if (_calMonth < 0)  { _calMonth = 11; _calYear--; }
+    if (_calMonth > 11) { _calMonth = 0;  _calYear++; }
+    renderCalendar();
+  }
+
+  function getFeastCat(f) {
+    if (['🍁','🎉','👨‍👩‍👧'].includes(f.icon)) return 'holiday';
+    if (f.icon === '🙏') return 'fast';
+    return 'feast';
+  }
+
+  function renderCalendar() {
+    const MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    const lbl = document.getElementById('cal-month-label');
+    if (!lbl) return;
+    lbl.textContent = MONTHS[_calMonth] + ' ' + _calYear;
+
+    const padZ = n => String(n).padStart(2,'0');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayStr = `${today.getFullYear()}-${padZ(today.getMonth()+1)}-${padZ(today.getDate())}`;
+
+    // Build feast map for this month
+    const mKey = `${_calYear}-${padZ(_calMonth+1)}`;
+    const fMap = {};
+    FEAST_DAYS.forEach(f => {
+      if (f.d.startsWith(mKey)) {
+        const d = parseInt(f.d.slice(8));
+        if (!fMap[d]) fMap[d] = [];
+        fMap[d].push(f);
+      }
+    });
+
+    const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
+    const firstDayRaw = new Date(_calYear, _calMonth, 1).getDay(); // 0=Sun
+    const startOffset = firstDayRaw === 0 ? 6 : firstDayRaw - 1;  // Mon-based grid
+
+    let out = ['Mo','Tu','We','Th','Fr','Sa','Su']
+                .map(d => `<div class="cal-hdr">${d}</div>`).join('');
+
+    for (let i = 0; i < startOffset; i++) out += '<div class="cal-cell empty"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dStr   = `${_calYear}-${padZ(_calMonth+1)}-${padZ(d)}`;
+      const feasts = fMap[d] || [];
+      const isToday = dStr === todayStr;
+
+      let cls = 'cal-cell';
+      let onclick = '';
+      let dot = '';
+
+      if (feasts.length) {
+        const cats = feasts.map(getFeastCat);
+        if      (cats.includes('feast'))   cls += ' cal-feast';
+        else if (cats.includes('holiday')) cls += ' cal-holiday';
+        else                               cls += ' cal-fast';
+        if (isToday) cls += ' cal-today';
+        const detail = JSON.stringify(feasts.map(f => f.icon + ' ' + f.name).join('  ·  '));
+        onclick = `onclick="calShowEvent(${detail})"`;
+        dot = '<div class="cal-dot"></div>';
+      } else if (isToday) {
+        cls += ' cal-today';
+      }
+
+      out += `<div class="${cls}" ${onclick}>${d}${dot}</div>`;
+    }
+
+    document.getElementById('cal-grid').innerHTML = out;
+    const det = document.getElementById('cal-event-detail');
+    if (det) { det.textContent = ''; det.classList.remove('visible'); }
+  }
+
+  function calShowEvent(text) {
+    const det = document.getElementById('cal-event-detail');
+    if (!det) return;
+    det.textContent = text;
+    det.classList.add('visible');
   }
 
   document.addEventListener('DOMContentLoaded', initFeastBanner);
